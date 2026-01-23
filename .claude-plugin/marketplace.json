@@ -35,6 +35,15 @@
       "skills": [
         "./free-ai-chat-deployment"
       ]
+    },
+    {
+      "name": "debug",
+      "description": "系统化的调试技能 - 包含根本原因分析（5 Whys）、生产环境验证、工具使用指南等",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./general/debug"
+      ]
     }
   ]
 }

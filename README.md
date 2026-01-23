@@ -33,6 +33,20 @@ AI 辅助的项目文档审计工具。扫描项目中的 Markdown 文档，收�
 - "使用 Cloudflare 和 Azure 部署全栈应用"
 - "配置自定义域名"
 
+### 4. Debug (general/debug)
+系统化的调试技能 - 在提出任何解决方案之前，必须经过此调试框架。包含根本原因分析（5 Whys）、生产环境验证、工具使用指南等。帮助避免症状修复、选择性验证偏差等常见调试陷阱。
+
+**使用场景**：
+- "使用 debug 技能分析这个问题"
+- "帮我用 5 Whys 方法找出根本原因"
+- "验证生产环境中的问题"
+免费部署 AI 聊天应用到多云环境（Cloudflare Pages + Azure Functions + 阿里云域名）。包含前端部署、后端 API 配置、自定义域名设置、SSE 流式传输等完整流程。
+
+**使用场景**：
+- "帮我部署一个 AI 聊天应用"
+- "使用 Cloudflare 和 Azure 部署全栈应用"
+- "配置自定义域名"
+
 ## 安装方法
 
 ### 在 Claude Code VSCode 扩展中安装
@@ -55,6 +69,7 @@ claude plugin marketplace add liuxiaoyusky/ai-developer-skills
 claude plugin install doc-auditor@liuxiaoyusky
 claude plugin install conversation-exporter@liuxiaoyusky
 claude plugin install free-ai-chat-deployment@liuxiaoyusky
+claude plugin install debug@liuxiaoyusky
 ```
 
 ## 使用方法
@@ -67,6 +82,8 @@ claude plugin install free-ai-chat-deployment@liuxiaoyusky
 "使用 conversation-exporter 技能导出当前对话"
 
 "使用 free-ai-chat-deployment 技能部署我的 AI 应用"
+
+"使用 debug 技能分析这个问题"
 ```
 
 ## 技能开发

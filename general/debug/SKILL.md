@@ -1,3 +1,8 @@
+---
+name: debug
+description: 系统化的调试技能 - 在提出任何解决方案之前，必须经过此调试框架。包含根本原因分析（5 Whys）、生产环境验证、工具使用指南等。帮助避免症状修复、选择性验证偏差等常见调试陷阱。
+---
+
 # Debug Skill
 
 > **CRITICAL**: Before proposing ANY solution, you MUST go through this debugging framework.
