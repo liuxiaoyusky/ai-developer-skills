@@ -1,23 +1,40 @@
 {
   "name": "ai-developer-skills",
-  "description": "AI 辅助开发技能集合 - 包含文档审计、对话导出、免费 AI 聊天部署等实用技能",
-  "version": "1.0.0",
-  "author": "liuxiaoyusky",
-  "skills": [
+  "owner": {
+    "name": "liuxiaoyusky",
+    "email": "noreply@github.com"
+  },
+  "metadata": {
+    "description": "AI 辅助开发技能集合 - 包含文档审计、对话导出、免费 AI 聊天部署等实用技能",
+    "version": "1.0.0"
+  },
+  "plugins": [
     {
       "name": "doc-auditor",
-      "path": "doc-auditor",
-      "description": "AI 辅助的项目文档审计工具"
+      "description": "AI 辅助的项目文档审计工具",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./doc-auditor"
+      ]
     },
     {
       "name": "conversation-exporter",
-      "path": "general/conversation-exporter",
-      "description": "导出 Claude Code 对话历史为 Markdown 格式"
+      "description": "导出 Claude Code 对话历史为 Markdown 格式",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./general/conversation-exporter"
+      ]
     },
     {
       "name": "free-ai-chat-deployment",
-      "path": "free-ai-chat-deployment",
-      "description": "免费部署 AI 聊天应用到多云环境（Cloudflare + Azure + 阿里云域名）"
+      "description": "免费部署 AI 聊天应用到多云环境（Cloudflare + Azure + 阿里云域名）",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./free-ai-chat-deployment"
+      ]
     }
   ]
 }
