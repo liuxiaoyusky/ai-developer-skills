@@ -1,0 +1,10 @@
+name = "your-project-name"
+compatibility_date = "2024-01-01"
+
+# 生产环境变量
+[env.production]
+VITE_API_URL = "https://your-function-app.azurewebsites.net/api"
+
+# 预览环境变量
+[env.preview]
+VITE_API_URL = "https://your-function-app.azurewebsites.net/api"
