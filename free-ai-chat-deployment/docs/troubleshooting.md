@@ -153,6 +153,254 @@ ls -la dist/
 
 ---
 
+## Production Debugging & Verification Gap
+
+### 问题：部署成功但用户报告问题依旧
+
+**症状**:
+- 部署工具显示"Success"
+- 但用户仍看到旧的错误
+- 代码修改似乎没有生效
+
+**根因**: **The Verification Gap（验证差距）**
+
+现代 Web 应用有多层缓存：
+```
+你的本地代码 → 构建产物 → 部署的文件 → 用户实际看到的
+     ✅          ✅         ✅          ❌ (现实差距)
+```
+
+**关键认知**:
+> **"部署成功" ≠ "用户看到了新代码"**
+>
+> **验证用户实际看到的，而不是你认为他们应该看到的**
+
+---
+
+### 理论框架：为什么调试失败
+
+#### Theory 1: 错误信息即真理（Error Messages Are Ground Truth）
+
+用户报错中的文件名、URL、行号是**唯一的事实**：
+
+```
+❌ 错误做法: 检查本地构建，看到正确的 API，假设问题已解决
+✅ 正确做法: 用户错误显示 index-ABC.js:18 → 检查 THAT 文件 → 发现错误的 API
+```
+
+**规则**:
+- 错误中的文件名 = FACT（事实）
+- 永远不要用"构建产物"反驳"运行时错误"
+- 总是验证错误信息指向的内容
+
+#### Theory 2: 工具成功 ≠ 用户成功（Tool Success ≠ User Success）
+
+工具报告成功有多个层级：
+
+```
+Level 1: 工具执行         ✅ (Bash 说 "Success")
+Level 2: 文件上传         ✅ (Wrangler 说 "Deployed")
+Level 3: 新文件已部署     ❓ (可能，可能没有)
+Level 4: CDN 提供新文件   ❌ (缓存可能提供旧文件)
+Level 5: 用户收到新文件   ❌ ← 唯一重要的
+```
+
+**规则**:
+> **工具成功 ≠ 生产现实**
+>
+> **CDN、缓存、DNS、负载均衡在"已部署"和"已提供"之间制造差距**
+
+#### Theory 3: 缓存优先假设（Cache-First Assumption）
+
+现代 Web 在**每一层**都有缓存：
+
+```
+浏览器 → CDN → 服务器 → 构建 → DNS
+  ↓       ↓      ↓       ↓      ↓
+ 缓存   缓存   缓存    缓存   缓存
+```
+
+**规则**:
+> **始终假设你可能看到旧数据**
+>
+> **使用 cache-busting 方法验证生产环境**
+
+#### Theory 4: 选择性验证偏差（Selective Verification Bias）
+
+**错误**:
+1. 检查**简单路径**（本地构建）→ ✅ 看起来正常
+2. 跳过**困难路径**（生产现实）
+3. 第一次确认后停止搜索
+
+**修正**:
+> **在问题所在处验证，而不是方便处**
+>
+> **用户的错误 > 你的假设 > 工具报告**
+
+---
+
+### 生产环境验证流程
+
+#### Step 1: 从错误信息中提取实际 URL
+
+```bash
+# 用户错误: "index-FPRo3oei.js:18 API 调用失败"
+# → 提取文件名: index-FPRo3oei.js
+# → 这是唯一的真相来源
+```
+
+#### Step 2: 验证**实际运行**的内容
+
+```bash
+# ❌ 错误做法: 检查本地构建
+cat dist/assets/index-D0w4YXqF.js | grep API_URL
+
+# ✅ 正确做法: 检查错误信息中的文件
+curl https://domain.com/assets/index-FPRo3oei.js | grep API_URL
+
+# 或更好的: 先从 HTML 获取实际文件名
+curl https://domain.com/ | grep -o "assets/index-.*\.js"
+# 然后验证那个特定文件
+```
+
+#### Step 3: Cache-busting 验证
+
+**方法 1: 直接文件检查（绕过 HTML 缓存）**
+```bash
+curl -s https://domain.com/assets/ACTUAL-FILENAME.js | grep PATTERN
+```
+
+**方法 2: 使用 cache-busting 头**
+```bash
+curl -H "Cache-Control: no-cache" \
+     -H "Pragma: no-cache" \
+     https://domain.com/assets/ACTUAL-FILENAME.js
+```
+
+**方法 3: 指示用户硬刷新**
+- Chrome: `Cmd+Shift+R` (Mac) / `Ctrl+Shift+R` (Windows)
+- Firefox: `Ctrl+Shift+R`
+- Edge: `Ctrl+F5`
+
+#### Step 4: 部署验证反模式
+
+```bash
+# ❌ 不要相信这些:
+- "Wrangler: Upload successful (21 files)"
+- "Deploy completed in 3.2s"
+- "Build succeeded"
+
+# ✅ 要相信这些:
+- 实际文件内容检查
+- 浏览器 DevTools Network 标签
+- 用户的错误信息
+```
+
+---
+
+### 真实案例研究
+
+#### ❌ 错误做法（我犯的错）
+
+```bash
+# Step 1: 本地重新构建
+npm run build
+# 创建: dist/assets/index-D0w4YXqF.js
+
+# Step 2: 检查本地构建（错误！）
+curl dist/assets/index-D0w4YXqF.js | grep API
+# 结果: https://volaris-api-flex.azurewebsites.net ✅
+
+# Step 3: 部署
+npx wrangler pages deploy dist
+# 结果: "21 files uploaded" ✅
+
+# Step 4: 宣布成功
+# "问题已解决！"
+
+# 现实: 用户仍看到旧文件和旧 API
+```
+
+**错误**:
+1. ✅ 检查了文件，但**错误的文件**（本地 vs 生产）
+2. ✅ 使用了工具，但**信任工具输出**超过用户现实
+3. ✅ 部署了，但**没有验证提供的内容**
+4. ❌ **没有检查错误信息中的实际文件**
+
+#### ✅ 正确做法（应该怎么做）
+
+```bash
+# Step 1: 从错误中提取实际文件名
+# 用户错误显示: index-FPRo3oei.js
+
+# Step 2: 检查 HTML 引用的内容
+curl https://volaris.skyliu.tech/ | grep "index-.*\.js"
+# 结果: assets/index-FPRo3oei.js (匹配错误！)
+
+# Step 3: 验证那个特定文件
+curl https://volaris.skyliu.tech/assets/index-FPRo3oei.js | grep API
+# 结果: https://volaris-api-test-ajfyavbcgacdc0a3.eastasia-01.azurewebsites.net ❌
+
+# Step 4: 找到根因
+# 生产环境提供的是旧构建，不是新构建
+
+# Step 5: 强制缓存失效
+# 方法: 触摸文件改变 hash，等待 CDN 传播
+```
+
+**关键洞察**:
+- 错误信息 → 文件名的**真相来源**
+- HTML → 加载内容的**真相来源**
+- curl 生产文件 → **唯一可靠的验证**
+- "已部署" ≠ "提供给用户"
+
+---
+
+### 生产调试黄金法则
+
+1. **错误信息 = 现实**
+   - 文件名、URL、行号是事实
+   - 不要反驳错误信息
+
+2. **生产文件 ≠ 本地文件**
+   - 用户看到的可能不是你构建的
+   - CDN 缓存会提供旧版本
+
+3. **工具成功 ≠ 用户成功**
+   - 部署工具的成功消息 ≠ 用户收到新代码
+   - CDN、缓存会制造差距
+
+4. **始终在用户层验证**
+   - 检查用户实际加载的文件
+   - 使用实际的生产 URL
+
+5. **假设缓存在说谎**
+   - 始终使用 cache-busting 方法
+   - 不信任"已部署"消息
+
+---
+
+### 快速参考：当用户报告已部署应用的 Bug
+
+```bash
+# 1. 从错误中获取精确的文件名
+cat browser-error.txt | grep "\.js:"
+
+# 2. 验证生产 HTML
+curl -s https://domain.com/ | grep -o "assets/[^\"']*\.[js|css]"
+
+# 3. 检查实际的生产文件
+curl -s https://domain.com/assets/ACTUAL-FILENAME.js | grep "PATTERN"
+
+# 4. 如果需要，bust cache
+curl -H "Cache-Control: no-cache" https://domain.com/assets/ACTUAL-FILENAME.js
+
+# 5. 只有这时: 检查本地代码
+Read src/code.js  # 对比，不要假设
+```
+
+---
+
 ## CORS 问题
 
 ### 问题：CORS 错误
