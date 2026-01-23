@@ -1,4 +1,4 @@
-# deploy-ai-chat-trifecta 技能
+# free-ai-chat-deployment 技能
 
 ## 概述
 
@@ -7,7 +7,7 @@
 ## 技能结构
 
 ```
-deploy-ai-chat-trifecta/
+free-ai-chat-deployment/
 ├── skill.md                      # 主技能文档（从这里开始）
 ├── README.md                     # 本文件
 ├── templates/                    # 代码模板
