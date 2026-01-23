@@ -1,8 +1,13 @@
+---
+name: free-ai-chat-deployment
+description: 免费部署 AI 聊天应用到多云环境（Cloudflare Pages + Azure Functions + 阿里云域名）。包含前端部署、后端 API 配置、自定义域名设置、SSE 流式传输等完整流程。适用于需要低成本部署 AI 应用的开发者。
+---
+
 # 全栈 AI 应用部署技能 - Cloudflare + Azure + 阿里云域名
 
 ## 技能信息
 
-**名称**: `deploy-ai-chat-trifecta`
+**名称**: `free-ai-chat-deployment`
 **类别**: 部署 (deployment)
 **平台**: Cloudflare Pages + Azure Functions + 阿里云域名
 **难度**: 中级
