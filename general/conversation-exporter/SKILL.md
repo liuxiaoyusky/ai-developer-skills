@@ -30,7 +30,7 @@ Example:
 The easiest way to export your current conversation:
 
 1. **Just ask**: "Export this conversation to markdown"
-2. **Choose mode**: `minimal`, `standard`, or `detailed`
+2. **Choose mode**: Claude will ask you to select from `minimal`, `standard`, or `detailed`
 3. **Review output**: Check the generated markdown
 4. **Save file**: File is automatically saved with date stamp
 
@@ -42,8 +42,8 @@ To export a specific conversation file:
 
 "Export `~/.claude/projects/.../session-id.jsonl` to markdown"
 - Specify the full path to the `.jsonl` file
-- Optionally specify output location
-- Optionally choose export mode
+- Claude will ask you to choose the export mode
+- Optionally specify output location and mode in your request
 
 ---
 
@@ -435,6 +435,51 @@ Make it a habit to export important conversations:
 - Files that were edited
 - Configuration values
 - Clear explanations
+
+---
+
+## Implementation Workflow
+
+When using this skill to export a conversation, follow this workflow:
+
+1. **User Request**: User asks to export conversation (e.g., "Export this conversation to markdown")
+
+2. **Ask for Mode** (CRITICAL): Always ask the user which export mode they want:
+   - Use AskUserQuestion to present the three mode options
+   - Explain what each mode includes
+   - Let user choose based on their use case
+
+3. **Locate Conversation File**:
+   - For "this conversation": Find the current session's .jsonl file
+   - For specific file: Use the provided path
+
+4. **Execute Export**:
+   - Run the Python script with chosen mode
+   - Parse JSONL file
+   - Filter and format messages
+   - Generate markdown output
+
+5. **Verify Output**:
+   - Confirm file was created
+   - Show statistics (message count, mode, file location)
+   - Offer to show preview or make adjustments
+
+### Example Interaction
+
+**User**: "Export this conversation to markdown"
+
+**Assistant**: "I'll help you export this conversation. Which export mode would you like?"
+
+*Present options using AskUserQuestion:*
+- **Minimal** (仅对话) - Only conversation content, clean and readable
+- **Standard** (含工具调用) - Conversation + tool calls (files, commands)
+- **Detailed** (完整详细) - Complete record with tool outputs and diffs
+
+**User**: Selects "Minimal"
+
+**Assistant**: Exports using: `python3 scripts/export-conversation.py <file> output.md minimal`
+
+**Result**: "✅ Exported 660 messages to conversation-export-minimal.md"
 
 ---
 
