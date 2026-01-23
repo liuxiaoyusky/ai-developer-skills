@@ -26,6 +26,74 @@ Before responding to any problem, ALWAYS ask yourself:
 
 ---
 
+## 🧠 Theoretical Framework: Why Debugging Fails
+
+### 🔴 The Anti-Pattern: False Trust in Verification
+
+**The Verification Gap:**
+```
+Your Local Code → Build Artifacts → Deployed Files → What Users Actually See
+     ✅              ✅                ✅                  ❌ (Reality Gap)
+```
+
+**Critical Principle:**
+> **Verify what users ACTUALLY see, not what you THINK they should see**
+
+### Theory 1: Error Messages Are Ground Truth
+
+User error messages contain the ONLY absolute truth about production:
+
+```
+❌ WRONG: Check local build, see correct API, assume problem solved
+✅ RIGHT:  User error shows index-ABC123.js → Check THAT file → Find wrong API
+```
+
+**Rule:**
+- Filenames, URLs, line numbers in errors are FACTS
+- Never use "build artifacts" to contradict "runtime errors"
+- Always verify what the error message POINTS TO
+
+### Theory 2: Tool Success ≠ User Success
+
+Tools report success at multiple levels:
+```
+Level 1: Tool executed         ✅ (Bash says "Success")
+Level 2: Files uploaded        ✅ (Wrangler says "Deployed")
+Level 3: New files deployed    ❓ (Maybe, maybe not)
+Level 4: CDN serving new files ❌ (Cache may serve old)
+Level 5: Users getting new files ❌ ← ONLY THIS MATTERS
+```
+
+**Rule:**
+> **Tool success ≠ Production reality**
+> **CDN, cache, DNS, load balancers create gaps between "deployed" and "served"**
+
+### Theory 3: The Cache-First Assumption
+
+Modern web has caching at EVERY layer:
+```
+Browser → CDN → Server → Build → DNS
+  ↓       ↓      ↓       ↓      ↓
+ Cache  Cache  Cache   Cache  Cache
+```
+
+**Rule:**
+> **Always assume you might see OLD data**
+> **Verify production with cache-busting methods**
+
+### Theory 4: Selective Verification Bias
+
+**The mistake:**
+1. You check the EASY path (local build) → ✅ Looks good
+2. You skip the HARD path (production reality)
+3. You stop searching after first confirmation
+
+**The fix:**
+> **Verify where the pain is, not where it's convenient**
+> **User's error > Your assumptions > Tool reports**
+
+---
+
 ## 🔍 Investigation Process
 
 ### Phase 1: Gather Information
@@ -92,13 +160,71 @@ ROOT CAUSE: Missing finally block to close connections in error path
 3. Consider edge cases and side effects
 4. Plan verification steps
 
-### Phase 5: Verification Plan
+### Phase 5: Verification Plan - The Production Reality Check
 
-**Always verify with tools:**
-- Read the code you modified to ensure correctness
-- Use Grep to check for similar issues elsewhere
-- Run tests with Bash
-- Check logs for errors
+**🚨 CRITICAL: Verify where users actually experience the problem**
+
+#### Standard Verification Flow (for most cases):
+1. Read the code you modified
+2. Use Grep to check for similar issues
+3. Run tests with Bash
+4. Check logs for errors
+
+#### 🔴 PRODUCTION Verification Flow (for deployed apps):
+
+**Step 1: Extract actual URLs from error messages**
+```bash
+# User error: "index-FPRo3oei.js:18 API call failed"
+# → Extract filename: index-FPRo3oei.js
+# → This is the ONLY source of truth
+```
+
+**Step 2: Verify what's ACTUALLY running**
+```bash
+# ❌ WRONG: Check your local build
+cat dist/assets/index-D0w4YXqF.js | grep API_URL
+
+# ✅ RIGHT: Check the file from error message
+curl https://domain.com/assets/index-FPRo3oei.js | grep API_URL
+
+# Or better: Get actual filename from HTML first
+curl https://domain.com/ | grep -o "assets/index-.*\.js"
+# Then verify THAT specific file
+```
+
+**Step 3: Cache-busting verification**
+```bash
+# Method 1: Direct file inspection (bypasses HTML cache)
+curl -s https://domain.com/assets/ACTUAL-FILENAME.js | grep PATTERN
+
+# Method 2: With cache-busting headers
+curl -H "Cache-Control: no-cache" \
+     -H "Pragma: no-cache" \
+     https://domain.com/assets/ACTUAL-FILENAME.js
+
+# Method 3: Instruct user to hard refresh
+# Chrome/Cmd+Shift+R, Firefox/Ctrl+Shift+R
+```
+
+**Step 4: Deployment verification anti-patterns**
+```bash
+# ❌ DON'T TRUST THESE:
+- "Wrangler: Upload successful (21 files)"
+- "Deploy completed in 3.2s"
+- "Build succeeded"
+
+# ✅ DO TRUST THESE:
+- Actual file content inspection
+- Browser DevTools Network tab
+- User's error messages
+```
+
+**Verification Checklist for Deployed Apps:**
+- [ ] Extracted exact filename from user's error
+- [ ] Retrieved HTML to see what files are referenced
+- [ ] Verified the ACTUAL referenced file (not local build)
+- [ ] Checked with cache-busting method
+- [ ] Confirmed with user that error is resolved
 - Test the specific behavior that was broken
 
 **Verification checklist:**
@@ -220,6 +346,122 @@ Verify: Run query, confirm only 2 queries instead of 150
 4. **No verification** - Always plan how to test the fix
 5. **Premature solutions** - Don't propose solutions until you understand the problem
 6. **Not using tools** - Use Read/Grep/Bash to investigate and verify
+
+### 🔴 CRITICAL: Production Debugging Pitfalls
+
+7. **Trusting "build artifacts" over "runtime errors"**
+   - ❌ "Local build looks correct"
+   - ✅ "User's error shows file ABC.js, let me check THAT file"
+
+8. **Believing deployment tools**
+   - ❌ "Wrangler says deployed successfully"
+   - ✅ "Let me verify what's actually being served"
+
+9. **Checking the wrong file**
+   - ❌ Checking `dist/index-NEW.js` (your build)
+   - ✅ Checking `assets/index-OLD.js` (what user loads)
+
+10. **Ignoring the cache layer**
+    - ❌ "I deployed, users should see it"
+    - ✅ "CDN might cache old files, let me verify"
+
+---
+
+## 📚 Real-World Case Study: The Verification Gap
+
+### Scenario: Custom Domain Can't Connect to Backend
+
+**User Report:**
+```
+Error: volaris-api-test-ajfyavbcgacdc0a3.eastasia-01.azurewebsites.net
+       Failed to load resource: net::ERR_NAME_NOT_RESOLVED
+File: index-FPRo3oei.js
+```
+
+### ❌ The Wrong Way (What I Did)
+
+```bash
+# Step 1: Rebuild locally
+npm run build
+# Creates: dist/assets/index-D0w4YXqF.js
+
+# Step 2: Check LOCAL build (WRONG!)
+curl dist/assets/index-D0w4YXqF.js | grep API
+# Result: https://volaris-api-flex.azurewebsites.net ✅
+
+# Step 3: Deploy
+npx wrangler pages deploy dist
+# Result: "21 files uploaded" ✅
+
+# Step 4: Declare success
+# "Problem solved!"
+
+# REALITY: User still sees OLD file with OLD API
+```
+
+**Mistakes:**
+1. ✅ Checked file, but **wrong file** (local vs production)
+2. ✅ Used tools, but **trusted tool output** over user reality
+3. ✅ Deployed, but **didn't verify what was served**
+4. ❌ **Didn't check the actual file from error message**
+
+### ✓ The Right Way (What I Should Have Done)
+
+```bash
+# Step 1: Extract ACTUAL filename from error
+# User error shows: index-FPRo3oei.js
+
+# Step 2: Check what HTML references
+curl https://volaris.skyliu.tech/ | grep "index-.*\.js"
+# Result: assets/index-FPRo3oei.js (matches error!)
+
+# Step 3: Verify THAT specific file
+curl https://volaris.skyliu.tech/assets/index-FPRo3oei.js | grep API
+# Result: https://volaris-api-test-ajfyavbcgacdc0a3.eastasia-01.azurewebsites.net ❌
+
+# Step 4: ROOT CAUSE FOUND
+# Production serves OLD build, not new build
+
+# Step 5: Force cache invalidation
+# Method: Touch files to change hashes, wait CDN propagation
+```
+
+**Key Insights:**
+- Error message → **Source of truth** for filenames
+- HTML → **Source of truth** for what's loaded
+- curl production file → **Only reliable verification**
+- "Deployed" ≠ "Served to users"
+
+---
+
+## 🎯 Quick Reference: Production Debugging
+
+### When User Reports a Bug in Deployed App:
+
+```bash
+# 1. Get exact filenames from error
+cat browser-error.txt | grep "\.js:"
+
+# 2. Verify production HTML
+curl -s https://domain.com/ | grep -o "assets/[^\"']*\.[js|css]"
+
+# 3. Check ACTUAL production files
+curl -s https://domain.com/assets/ACTUAL-FILENAME.js | grep "PATTERN"
+
+# 4. Cache-bust if needed
+curl -H "Cache-Control: no-cache" https://domain.com/assets/ACTUAL-FILENAME.js
+
+# 5. Only then: Check local code
+Read src/code.js  # Compare, don't assume
+```
+
+### Golden Rules:
+
+1. **Error messages = Reality**
+2. **Production files ≠ Local files**
+3. **Tool success ≠ User success**
+4. **Always verify at the user's layer**
+5. **Assume cache is lying to you**
 
 ---
 
