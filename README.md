@@ -89,6 +89,39 @@ claude plugin install first-principles-planner@liuxiaoyusky
 claude plugin install ralph-wiggum@liuxiaoyusky
 ```
 
+## 更新技能
+
+### 更新已安装的技能
+
+**通过 CLI 更新：**
+```bash
+# 更新特定技能
+claude plugin update ralph-wiggum@liuxiaoyusky
+
+# 更新所有来自此 marketplace 的技能
+claude plugin marketplace update liuxiaoyusky/ai-developer-skills
+```
+
+**通过 VSCode 扩展更新：**
+1. 打开 `/plugins` 命令
+2. 切换到 **Marketplaces** 标签页
+3. 找到 `liuxiaoyusky/ai-developer-skills`
+4. 点击刷新图标更新到最新版本
+5. 切换到 **Plugins** 标签页
+6. 找到需要更新的技能，点击更新图标
+
+**重新加载技能：**
+如果技能文件已更新但未生效：
+- VSCode: `Cmd+Shift+P` → "Reload Window"
+- 或重启 Claude Code
+
+### 开发者本地测试
+
+如果你正在开发技能并想测试修改：
+1. 修改 `SKILL.md` 或相关文件
+2. 重新加载 VSCode 窗口
+3. 技能会自动重新加载（无需重新安装）
+
 ## 使用方法
 
 安装后，您可以直接在对话中提到技能名称：
