@@ -1,35 +1,35 @@
 @echo off
 setlocal enabledelayedexpansion
-REM Ralph Wiggum Loop - 简洁版
-REM 原始理念：5行代码实现强大功能
+REM Ralph Wiggum Loop - 极简版
+REM 所有检查由前置 skills 处理，loop 只负责执行和提交
 
 set ITERATION=0
 
 :loop
 set /a ITERATION+=1
 
-REM 计算任务进度（使用 PowerShell）
-for /f "tokens=*" %%a in ('powershell -Command "$total = (Select-String -Path AGENTS.md -Pattern '^\- \[.\]' -AllMatches).Matches.Count; $done = (Select-String -Path AGENTS.md -Pattern '^\- \[x\]' -AllMatches).Matches.Count; Write-Output \"$done/$total\""') do set PROGRESS=%%a
-
 echo ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-echo 🔄 迭代 #!ITERATION! | 进度: !PROGRESS! 任务已完成
+echo 🔄 迭代 #!ITERATION!
 echo ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-REM 运行 Claude
-type PROMPT_build.md | claude -p --dangerously-skip-permissions --verbose
+REM 运行 Claude（skills 会处理所有检查和决策）
+for /f "delims=" %%a in ('type PROMPT_build.md ^| claude -p --dangerously-skip-permissions --verbose 2^>^&1') do set "OUTPUT=%%a"
 
-REM 检查是否所有任务完成
-REM 使用 PowerShell 检查是否还有未完成的任务
-powershell -Command "if (-not (Select-String -Path AGENTS.md -Pattern '\- \[ \]' -Quiet)) { exit 0 } else { exit 1 }"
-if !errorlevel! equ 0 (
-    echo ✅ 所有任务已完成！
-    goto :eof
-)
-
-REM 推送更改（可选）
+REM 提交进度
+git add -A
+git commit -m "iteration !ITERATION!" 2>nul || echo No changes to commit
 for /f "tokens=*" %%i in ('git branch --show-current 2^>nul') do set CURRENT_BRANCH=%%i
 if defined CURRENT_BRANCH (
     git push origin !CURRENT_BRANCH! 2>nul
 )
 
+REM 检查 skills 输出的完成标记
+echo !OUTPUT! | findstr "RALPH_COMPLETE" >nul
+if !errorlevel! equ 0 (
+    echo ✅ 所有任务已完成！
+    goto :eof
+)
+
+REM 短暂延迟，避免快速循环
+timeout /t 1 >nul
 goto loop

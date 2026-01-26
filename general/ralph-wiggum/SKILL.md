@@ -1,11 +1,13 @@
 ---
 name: ralph-wiggum
-description: 搭建用于 Ralph Wiggum 的 bash 文件和相关文件，适合长期自运行自迭代项目。支持 Build 模式（一键启动）和 Plan 模式（交互式配置），跨平台支持（Linux/macOS/Windows），默认集成 debug skills 加速迭代。触发场景："开始 ralph 循环"、"启动 ralph"、"ralph wiggum"、"使用 ralph 自动开发"。
+description: 搭建用于 Ralph Wiggum 的 bash 文件和相关文件，适合长期自运行自迭代项目。支持 Build 模式（一键启动）和 Plan 模式（交互式配置），跨平台支持（Linux/macOS/Windows），默认集成 debug skills 加速迭代。现已集成 first-principles-planner，可自动生成实施计划。支持 IMPLEMENTATION_PLAN.md 和 AGENTS.md 双模式。触发场景："开始 ralph 循环"、"启动 ralph"、"ralph wiggum"、"使用 ralph 自动开发"。
 ---
 
 # Ralph Wiggum Skill
 
 基于 Bash 循环的 Ralph Wiggum 技术，让 AI 持续迭代直到完成所有任务。
+
+**🆕 新特性**：现已集成 `first-principles-planner` skill，使用第一性原理思维生成更高质量的实施计划。
 
 ## 核心原则
 
@@ -39,16 +41,17 @@ description: 搭建用于 Ralph Wiggum 的 bash 文件和相关文件，适合�
 ### 模式一：Build 模式（一键启动，默认）
 
 **使用场景**：
-- 项目已配置好 AGENTS.md
+- 项目已配置好 IMPLEMENTATION_PLAN.md 或 AGENTS.md
 - 已有明确的目标和任务
 - 需要立即开始迭代
 
 **特点**：
 - ✅ **零交互** - 完全自动运行
-- ✅ **无限循环** - 直到完成 AGENTS.md 中的所有任务
+- ✅ **无限循环** - 直到完成计划文件中的所有任务
 - ✅ **默认模型** - 使用 Claude Code 当前使用的模型（不指定 --model 参数）
 - ✅ **深度调试集成** - 默认使用本项目的 debug skills
-- ✅ **自动检测完成** - 当 AGENTS.md 中的所有任务完成时自动停止
+- ✅ **自动检测完成** - 当 IMPLEMENTATION_PLAN.md 或 AGENTS.md 中的所有任务完成时自动停止
+- 🆕 **优先使用 IMPLEMENTATION_PLAN.md** - 如果存在，优先使用包含更丰富信息的实施计划
 
 **启动方式**：
 ```bash
@@ -56,11 +59,12 @@ description: 搭建用于 Ralph Wiggum 的 bash 文件和相关文件，适合�
 ```
 
 **工作流程**：
-1. 检查 AGENTS.md 是否存在
-2. 如果不存在，提示用户先运行 `/ralph-wiggum plan`
-3. 生成 loop.sh 或 loop.bat（根据操作系统）
-4. 启动循环
-5. 自动检测任务完成，停止循环
+1. 检查 IMPLEMENTATION_PLAN.md 或 AGENTS.md 是否存在（优先使用前者）
+2. 如果都不存在，提示用户先运行 `/ralph-wiggum plan`
+3. 如果使用 IMPLEMENTATION_PLAN.md，自动生成或更新 AGENTS.md（用于循环脚本）
+4. 生成 loop.sh 或 loop.bat（根据操作系统）
+5. 启动循环
+6. 自动检测任务完成，停止循环
 
 ---
 
@@ -86,13 +90,18 @@ description: 搭建用于 Ralph Wiggum 的 bash 文件和相关文件，适合�
 
 **交互流程**：
 1. 环境检测（操作系统、Git 状态、项目结构）
-2. 交互式配置：
+2. **智能引导阶段** - AI 会主动询问：
+   - **项目目标**：你想构建什么？解决什么问题？
+   - **当前状态**：新项目还是已有代码？
+   - **技术栈**：偏好哪些技术/框架？
+   - **任务优先级**：哪些功能最重要？
+   - **范围边界**：哪些不在范围内？
+3. 交互式配置：
    - **Debug Skills Marketplace**：询问是否添加 `liuxiaoyusky/ai-developer-skills` marketplace（推荐）
-   - **AGENTS.md 配置**：创建或更新任务清单
    - **模型选择**：opus/sonnet/haiku/默认
    - **最大迭代次数**：默认 0（无限）
-3. 生成脚本和模板文件
-4. 展示配置并询问是否立即启动
+4. 生成脚本和模板文件
+5. 展示配置并询问是否立即启动
 
 **默认集成 Debug Skills**：
 Plan 模式会自动执行以下命令：
@@ -105,6 +114,66 @@ claude plugin marketplace add liuxiaoyusky/ai-developer-skills
 - 生产环境调试最佳实践
 - 工具使用指南（Read/Grep/Bash）
 - 常见调试陷阱避免
+
+---
+
+### 🆕 First-Principles-Planner 集成
+
+Plan 模式现已集成 `first-principles-planner` skill，提供更深入的项目规划：
+
+**集成特性**：
+- ✅ **自动检测** - Plan 模式自动检查是否存在 IMPLEMENTATION_PLAN.md
+- ✅ **智能建议** - 如果没有实施计划，建议使用 first-principles-planner 创建
+- ✅ **第一性原理** - 使用 5 Whys 技术挖掘本质需求，区分"想要" vs "需要"
+- ✅ **功能筛选** - 从用户想法中提炼出 3-5 个最核心的功能
+- ✅ **验收标准** - 为每个功能定义可测试的验收标准
+- ✅ **MVP vs 完整版** - 每个功能定义两个版本，让用户选择实现程度
+
+**工作流程**：
+1. Plan 模式启动时检查 IMPLEMENTATION_PLAN.md
+2. 如果不存在，询问用户："是否使用 first-principles-planner 创建实施计划？"
+3. 如果用户同意，调用 `/first-principles-planner` skill
+4. skill 通过 5 阶段对话生成 IMPLEMENTATION_PLAN.md（15-30 分钟）
+5. Plan 模式从 IMPLEMENTATION_PLAN.md 提取信息生成 AGENTS.md
+6. Build 模式使用 IMPLEMENTATION_PLAN.md 作为主要计划文件
+
+**生成的 IMPLEMENTATION_PLAN.md 包含**：
+- 执行摘要（核心问题、价值主张、目标用户）
+- 3-5 个核心功能（MVP vs 完整版范围）
+- 每个功能的验收标准和测试用例
+- 明确排除的功能（Out of Scope）
+- 技术考虑和推荐技术栈
+- 成功指标和实施阶段
+- 第一性原理依据（为什么选择这些功能）
+
+---
+
+## 优化策略
+
+### 智能文件读取（Documentation-First）
+
+Ralph Wiggum 采用**文档优先、按需读取**的策略，避免过度的 token 消耗：
+
+**Plan 模式**：
+1. ✅ 优先读取 `.md` 文件（README, IMPLEMENTATION_PLAN.md, AGENTS.md, specs/）
+2. ✅ 使用 `AskUserQuestion` 引导用户明确需求
+3. ✅ 只读取与用户需求相关的源文件
+4. ✅ 使用最多 50 个并行 subagents（不是 500）
+5. ❌ 避免全局扫描整个代码库
+
+**Build 模式**：
+1. ✅ 优先使用 IMPLEMENTATION_PLAN.md，回退到 AGENTS.md
+2. ✅ 从计划文件选择一个任务
+3. ✅ 使用 Grep/Glob 搜索任务相关的特定文件
+4. ✅ 只读取找到的相关文件
+5. ✅ 使用最多 50 个并行 subagents
+6. ❌ 避免读取所有 specs/* 或 src/*
+
+**关键原则**：
+- **先问再查** - 不确定时先问用户
+- **精准搜索** - 用关键词搜索，不全局遍历
+- **按需读取** - 只读相关文件
+- **避免重复** - 已读过的文件不重读
 
 ---
 
@@ -406,6 +475,12 @@ which claude  # 检查是否安装
 ---
 
 ## 版本历史
+
+- **v1.1.0** (2025-01-26) - 优化版本
+  - ✨ Plan 模式增加交互式引导（主动询问项目目标、优先级等）
+  - ⚡ 优化文件读取策略（文档优先、按需读取）
+  - 🔧 减少并行 subagents 数量（从 500 降至 50）
+  - 📝 添加"智能文件读取"说明文档
 
 - **v1.0.0** (2025-01-26) - 初始版本
   - 支持 Build 模式和 Plan 模式

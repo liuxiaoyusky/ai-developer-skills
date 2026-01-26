@@ -40,12 +40,27 @@ AI 辅助的项目文档审计工具。扫描项目中的 Markdown 文档，收�
 - "使用 debug 技能分析这个问题"
 - "帮我用 5 Whys 方法找出根本原因"
 - "验证生产环境中的问题"
-免费部署 AI 聊天应用到多云环境（Cloudflare Pages + Azure Functions + 阿里云域名）。包含前端部署、后端 API 配置、自定义域名设置、SSE 流式传输等完整流程。
+
+### 5. First Principles Planner (general/first-principles-planner)
+基于第一性原理的项目规划器。通过深度对话和追问，帮助用户从想法中提炼出 3-5 个核心功能，定义实现程度（MVP vs 完整版），并制定可验收的实施计划。
 
 **使用场景**：
-- "帮我部署一个 AI 聊天应用"
-- "使用 Cloudflare 和 Azure 部署全栈应用"
-- "配置自定义域名"
+- "规划新项目"
+- "设计功能需求"
+- "制定实施计划"
+- "梳理项目思路"
+- "我想做一个..."
+
+### 6. Ralph Wiggum (general/ralph-wiggum)
+搭建用于 Ralph Wiggum 的 bash 文件和相关文件，适合长期自运行自迭代项目。支持 Build 模式（一键启动）和 Plan 模式（交互式配置），跨平台支持（Linux/macOS/Windows），默认集成 debug skills 加速迭代。现已集成 first-principles-planner，可自动生成实施计划。
+
+**使用场景**：
+- "开始 ralph 循环"
+- "启动 ralph"
+- "ralph wiggum"
+- "使用 ralph 自动开发"
+- "长期项目"
+- "启动loop"
 
 ## 安装方法
 
@@ -70,6 +85,8 @@ claude plugin install doc-auditor@liuxiaoyusky
 claude plugin install conversation-exporter@liuxiaoyusky
 claude plugin install free-ai-chat-deployment@liuxiaoyusky
 claude plugin install debug@liuxiaoyusky
+claude plugin install first-principles-planner@liuxiaoyusky
+claude plugin install ralph-wiggum@liuxiaoyusky
 ```
 
 ## 使用方法
@@ -84,6 +101,10 @@ claude plugin install debug@liuxiaoyusky
 "使用 free-ai-chat-deployment 技能部署我的 AI 应用"
 
 "使用 debug 技能分析这个问题"
+
+"使用 first-principles-planner 技能规划我的新项目"
+
+"使用 ralph-wiggum 技能自动开发项目"
 ```
 
 ## 技能开发

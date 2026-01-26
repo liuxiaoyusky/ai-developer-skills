@@ -1,34 +1,72 @@
 # Ralph Wiggum - Build Mode Prompt
 
-## Phase 0: Orientation
+## Phase 0: Smart Orientation (Documentation-First)
 
-0a. Study `specs/*` with up to 500 parallel Sonnet subagents to learn the application specifications.
+0a. **Read task documentation**:
+   - Check for @IMPLEMENTATION_PLAN.md first (preferred - contains richer feature details and acceptance criteria)
+   - If not found, fall back to @AGENTS.md
+   - If neither exists, error with message: "No plan file found. Please run `/ralph-wiggum plan` first."
 
-0b. Study @AGENTS.md to understand the tasks and validation commands.
+0b. **Generate AGENTS.md from IMPLEMENTATION_PLAN.md** (if needed):
+   - If using IMPLEMENTATION_PLAN.md and AGENTS.md doesn't exist or is outdated:
+     - Extract Core Features section → Create task checkboxes in Tasks section
+     - Extract Acceptance Criteria from each feature → Create validation commands
+     - Extract Implementation Phases → Determine task ordering
+     - Extract Technical Considerations → Populate Build & Run section
+     - Save as AGENTS.md for compatibility with loop scripts
+   - This ensures loop scripts can track progress using checkbox format
 
-0c. For reference, the application source code is in `src/*`.
+0c. **Quick reference check**:
+
+0d. **Quick reference check**:
+   - For reference, the application source code is typically in `src/*`
+   - **Do NOT read all source files** - only read what's needed for the current task
+
+0e. **Minimal parallel subagents**:
+   - Use up to 50 parallel subagents (not 500)
+   - Focus only on files related to the specific task you're implementing
 
 ---
 
-## Phase 1: Task Selection and Implementation
+## Phase 1: Task Selection and Targeted Implementation
 
 1. **Choose and Implement**
 
-   Your task is to implement functionality per the specifications using parallel subagents.
+   Your task is to implement functionality per the specifications using targeted, efficient searches.
 
-   Follow @AGENTS.md and **choose the most important task** from the Tasks section to address.
+   Follow @IMPLEMENTATION_PLAN.md (or @AGENTS.md if no implementation plan exists) and **choose the most important task** from the Tasks/Features section to address.
 
-   **Before making changes**, search the codebase to confirm what's implemented (don't assume not implemented) using up to 500 parallel Sonnet subagents for searches/reads and only 1 Sonnet subagent for build/tests.
+2. **Smart Discovery (Don't Assume, Don't Over-Read)**
 
-   Use Opus subagents when complex reasoning is needed (debugging, architectural decisions).
+   **Before making changes**, use targeted searches to confirm what's implemented:
 
-2. **Implement**
+   - Use **Grep** to search for specific function/class names mentioned in the task
+   - Use **Glob** to find files matching patterns relevant to the task
+   - Use **Read** only on files that are:
+     - Directly mentioned in the task description
+     - Found via targeted searches
+     - Core configuration or entry point files
+   - Use up to 50 parallel subagents for targeted searches (not 500)
+   - Use 1 subagent for build/tests
+
+   **What NOT to do:**
+   - ❌ Do NOT read all files in `src/*` or `specs/*`
+   - ❌ Do NOT use 500 parallel subagents
+   - ❌ Do NOT study "everything" - be surgical
+
+   **What TO do:**
+   - ✅ Start with the task description
+   - ✅ Search for specific terms from the task
+   - ✅ Read only relevant files found
+   - ✅ Ask questions if uncertain
+
+3. **Implement**
 
    Implement the functionality completely. No placeholders or stubs - they waste effort and time redoing the same work.
 
    If functionality is missing based on the task description, it's your job to add it as per the specifications.
 
-   **Ultrathink.**
+   **Think carefully about the specific requirements before coding.**
 
 ---
 
@@ -36,7 +74,7 @@
 
 3. **Run Validation**
 
-   After implementing functionality or resolving problems, **run the validation commands specified in @AGENTS.md**:
+   After implementing functionality or resolving problems, **run the validation commands specified in @IMPLEMENTATION_PLAN.md or @AGENTS.md**:
    - Tests
    - Typecheck
    - Lint
@@ -72,25 +110,29 @@
 
 ## Phase 3: Update and Commit
 
-5. **Update AGENTS.md**
+5. **Update Plan Files**
 
    When you discover issues or complete tasks:
-   - Immediately update @AGENTS.md using a subagent
-   - Mark completed tasks as `- [x]`
+   - Immediately update both @IMPLEMENTATION_PLAN.md and @AGENTS.md using a subagent
+   - In IMPLEMENTATION_PLAN.md: Update feature completion status in relevant sections
+   - In AGENTS.md: Mark completed tasks as `- [x]`
    - Remove or note resolved issues
    - Add new issues discovered during implementation
 
 6. **Commit Changes**
 
    When the validation passes (no errors):
-   - Update @AGENTS.md (mark task as complete)
+   - Update both @IMPLEMENTATION_PLAN.md and @AGENTS.md (mark task/feature as complete)
    - `git add -A`
    - `git commit` with a message describing the changes
    - `git push`
 
 7. **Completion Detection**
 
-   When **all tasks in @AGENTS.md are complete** (all marked as `- [x]`):
+   When **all tasks in the plan file are complete**:
+   - Check IMPLEMENTATION_PLAN.md Implementation Phases section (all checkboxes marked as `- [x]`)
+   - Or check AGENTS.md Tasks section (all checkboxes marked as `- [x]`)
+   - When complete, output: `<RALPH_COMPLETE>`
    - Output: `<RALPH_COMPLETE>`
    - Exit the loop
 
