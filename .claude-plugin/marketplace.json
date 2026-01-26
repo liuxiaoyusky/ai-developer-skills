@@ -51,7 +51,7 @@
       "source": "./",
       "strict": false,
       "skills": [
-        "./ralph-wiggum"
+        "./general/ralph-wiggum"
       ]
     }
   ]
