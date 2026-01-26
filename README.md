@@ -41,7 +41,16 @@ AI 辅助的项目文档审计工具。扫描项目中的 Markdown 文档，收�
 - "帮我用 5 Whys 方法找出根本原因"
 - "验证生产环境中的问题"
 
-### 5. First Principles Planner (general/first-principles-planner)
+### 5. First Principles (general/first-principles)
+马思克式第一性原理思维 - 将复杂问题拆解到基本真理，从零重建解决方案。区别于类比思维和根因分析（5 Whys），用于创新突破和挑战假设。
+
+**使用场景**：
+- "使用第一性原理思考这个问题"
+- "如何从零重新设计这个系统？"
+- "挑战所有现有假设"
+- "找到突破性创新方案"
+
+### 6. First Principles Planner (general/first-principles-planner)
 基于第一性原理的项目规划器。通过深度对话和追问，帮助用户从想法中提炼出 3-5 个核心功能，定义实现程度（MVP vs 完整版），并制定可验收的实施计划。
 
 **使用场景**：
@@ -51,7 +60,7 @@ AI 辅助的项目文档审计工具。扫描项目中的 Markdown 文档，收�
 - "梳理项目思路"
 - "我想做一个..."
 
-### 6. Ralph Wiggum (general/ralph-wiggum)
+### 7. Ralph Wiggum (general/ralph-wiggum)
 搭建用于 Ralph Wiggum 的 bash 文件和相关文件，适合长期自运行自迭代项目。支持 Build 模式（一键启动）和 Plan 模式（交互式配置），跨平台支持（Linux/macOS/Windows），默认集成 debug skills 加速迭代。现已集成 first-principles-planner，可自动生成实施计划。
 
 **使用场景**：
@@ -85,6 +94,7 @@ claude plugin install doc-auditor@liuxiaoyusky
 claude plugin install conversation-exporter@liuxiaoyusky
 claude plugin install free-ai-chat-deployment@liuxiaoyusky
 claude plugin install debug@liuxiaoyusky
+claude plugin install first-principles@liuxiaoyusky
 claude plugin install first-principles-planner@liuxiaoyusky
 claude plugin install ralph-wiggum@liuxiaoyusky
 ```
@@ -99,7 +109,7 @@ claude plugin install ralph-wiggum@liuxiaoyusky
 claude plugin update ralph-wiggum@liuxiaoyusky
 
 # 更新所有来自此 marketplace 的技能
-claude plugin marketplace update liuxiaoyusky/ai-developer-skills
+claude plugin marketplace update ai-developer-skills
 ```
 
 **通过 VSCode 扩展更新：**
@@ -134,6 +144,8 @@ claude plugin marketplace update liuxiaoyusky/ai-developer-skills
 "使用 free-ai-chat-deployment 技能部署我的 AI 应用"
 
 "使用 debug 技能分析这个问题"
+
+"使用 first-principles 技能重新思考这个问题"
 
 "使用 first-principles-planner 技能规划我的新项目"
 
