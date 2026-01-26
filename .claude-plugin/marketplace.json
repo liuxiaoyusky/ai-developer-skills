@@ -53,6 +53,24 @@
       "skills": [
         "./general/ralph-wiggum"
       ]
+    },
+    {
+      "name": "first-principles",
+      "description": "马思克式第一性原理思维 - 将复杂问题拆解到基本真理，从零重建解决方案。区别于类比思维和根因分析（5 Whys），用于创新突破和挑战假设。",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./general/first-principles"
+      ]
+    },
+    {
+      "name": "first-principles-planner",
+      "description": "第一性原理在产品设计中的应用 - 将产品想法拆解到基本真理，质疑所有功能假设，从核心价值重建最小方案。区别于类比式需求收集，用于创新产品设计和 MVP 定义。",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./general/first-principles-planner"
+      ]
     }
   ]
 }
