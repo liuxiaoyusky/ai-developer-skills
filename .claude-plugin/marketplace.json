@@ -38,7 +38,7 @@
     },
     {
       "name": "debug",
-      "description": "系统化的调试技能 - 包含根本原因分析（5 Whys）、生产环境验证、工具使用指南等",
+      "description": "系统化问题解决技能 - 整合 5 Whys 根因分析和第一性原理重建思维，提供三层问题解决模型、双轨调试方法、生产环境验证和工具使用指南",
       "source": "./",
       "strict": false,
       "skills": [
@@ -70,6 +70,15 @@
       "strict": false,
       "skills": [
         "./general/first-principles-planner"
+      ]
+    },
+    {
+      "name": "linus-code-review",
+      "description": "Linus Torvalds 视角的代码审查 - 基于5层分析框架评估代码质量：数据结构、特殊情况、复杂度、破坏性、实用性。追求「好品味」(Good Taste)、向后兼容、简洁实用。**默认启用**：代码审查/编写/API设计/技术决策时自动应用Linus思维。智能建议：复杂任务(5+文件/500+行)时自动建议使用ralph-wiggum自动迭代。",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./general/linus-code-review"
       ]
     }
   ]

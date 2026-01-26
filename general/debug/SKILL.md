@@ -1,43 +1,148 @@
 ---
 name: debug
-description: 系统化调试技能 - 在提出解决方案前，必须完成根本原因分析。包含 5 Whys、生产环境验证、工具使用指南，避免症状修复和验证偏差。
+description: 系统化问题解决技能 - 整合 5 Whys 根因分析和第一性原理重建思维，提供三层问题解决模型、双轨调试方法、生产环境验证和工具使用指南。适用于故障排查、性能优化、系统重构和创新突破。
 ---
 
 # Debug Skill
 
-> **CRITICAL**: Before proposing ANY solution, you MUST go through this debugging framework.
+> **CRITICAL**: 在提出任何解决方案之前，必须通过此框架进行问题分析和路径选择。
 
 ---
 
-## 🎯 Core Questions (Ask Yourself FIRST)
+## 🎯 核心框架：三层问题解决模型
 
-Before responding to any problem, ALWAYS ask yourself:
+### Layer 1: 问题分类（决定解决路径）
 
-1. **"Is this the root cause or just a symptom?"**
-2. **"What does the user really want to accomplish?"**
-3. **"Will my solution serve their actual goal?"**
-4. **"Can I verify this really solves the problem?"**
+在开始调查之前，先回答 3 个核心问题：
+
+1. **"这是'系统行为错误'还是'设计理解错误'？"**
+   - 行为错误：系统做了不该做的事，或没做该做的事
+   - 设计理解错误：我们对系统的假设是错的
+
+2. **"这是'在现有框架内修复'还是'需要质疑框架'？"**
+   - 框架内修复：使用 5 Whys + 修复
+   - 质疑框架：使用第一性原理 + 重建
+
+3. **"用户的真实目标是什么？"**
+   - 不是修复 bug，而是实现目标
+   - 目标可能通过不同路径实现
+
+### Layer 2: 调查方法（双轨制）
+
+#### 轨道 A: 5 Whys 根因分析（自顶向下）
+
+**适用于**：
+- ✅ 明确的错误/异常
+- ✅ 系统行为与设计意图不符
+- ✅ 需要快速定位实现问题
+- ✅ 已知设计是正确的
+
+**方法**：
+```
+问题: API 返回 500 错误
+Why 1? → 数据库查询超时
+Why 2? → 连接池耗尽
+Why 3? → 连接未关闭
+Why 4? → 错误路径没调用 connection.close()
+Why 5? → 缺少 finally 块
+
+ROOT CAUSE: 缺少 finally 块来关闭连接
+SOLUTION: 添加 finally 块
+```
+
+#### 轨道 B: 第一性原理重建（自底向上）
+
+**适用于**：
+- ✅ 性能问题（慢、卡顿）
+- ✅ 复杂交互问题
+- ✅ 设计本身可能有问题
+- ✅ 需要创新突破
+- ✅ 5 Whys 找不到满意答案
+
+**方法**：
+```
+问题: API 响应慢（需要 10 秒）
+
+第一性原理拆解:
+基本真理:
+- 网络延迟: 50ms (物理限制)
+- 数据库查询: 5ms (简单查询)
+- 数据传输: 1MB/10Mbps = 0.8s
+
+质疑假设:
+- 我们需要传输这么多数据吗？
+  → 实际: 返回 1000 条完整记录
+  → 质疑: 用户真的需要一次看到 1000 条吗？
+  → 真理: 人眼只能同时处理 10-20 条
+
+重建方案:
+- 不修复查询性能
+- 改用分页（每页 20 条）
+- 结果: 响应时间 10s → 0.5s（降低 95%）
+```
+
+### Layer 3: 解决路径（四重选择）
+
+找到问题本质后，选择解决路径：
+
+1. **修复系统**（使实际 = 期望）
+   - 适用于：实现错误
+   - 方法: 修复 bug
+
+2. **修改期望**（使期望 = 实际）
+   - 适用于：需求理解错误
+   - 方法: 更新文档/用户沟通
+
+3. **重构系统**（设计新系统）
+   - 适用于：设计本身有问题
+   - 方法: 第一性原理重建
+
+4. **接受差异**（差异不重要）
+   - 适用于：非关键问题
+   - 方法: 技术债务记录
 
 ---
 
-## 🔍 Investigation Process
+## 🔍 调查流程（整合版）
 
-### Phase 1: Gather Information
+### Phase 1: 信息收集（所有情况通用）
 
-**Ask clarifying questions:**
-- What exact error message or behavior are you seeing?
-- When does this occur? (timing, context, triggers)
-- Can you share error logs, stack trace, or screenshots?
+**提出澄清问题**：
+- 具体的错误信息或行为是什么？
+- 何时发生？（时间、上下文、触发条件）
+- 能否分享错误日志、堆栈跟踪、截图？
 
-**Use tools to investigate:**
-- **Read** - Examine actual code/config (NEVER guess)
-- **Grep** - Search for patterns, related code
-- **Glob** - Find all relevant files
-- **Bash** - Check logs, processes, test behavior
+**使用工具调查**：
+- **Read** - 检查实际代码/配置（绝不猜测）
+- **Grep** - 搜索模式、相关代码
+- **Glob** - 查找所有相关文件
+- **Bash** - 检查日志、进程、测试行为
 
-### Phase 2: Root Cause Analysis (5 Whys)
+### Phase 2: 问题分类（选择轨道）
 
-Apply the **5 Whys technique** - ask "why" at least 5 times:
+**使用决策树**：
+
+```
+开始
+  ↓
+是否有明确错误/异常？
+  YES → 使用轨道 A (5 Whys)
+  NO  ↓
+
+是否是性能/设计问题？
+  YES → 使用轨道 B (第一性原理)
+  NO  ↓
+
+5 Whys 是否找到满意答案？
+  NO  → 切换到轨道 B (第一性原理)
+  YES → 继续用轨道 A
+```
+
+### Phase 3: 深度分析（轨道选择）
+
+#### 轨道 A: 5 Whys 根因分析
+
+应用 **5 Whys 技术** - 连问至少 5 次"为什么"：
 
 ```
 PROBLEM: API returns 500 error
@@ -50,154 +155,459 @@ Why 5? → Missing finally block in error handling
 ROOT CAUSE: Missing finally block to close connections
 ```
 
-**Distinguish symptom vs root cause:**
-- ❌ Symptom: "Page loads slowly"
-- ✅ Root cause: "Unoptimized N+1 database queries"
+**区分症状 vs 根本原因**：
+- ❌ Symptom: "页面加载缓慢"
+- ✅ Root cause: "未优化的 N+1 数据库查询"
 
-### Phase 3: Solution Design
+#### 轨道 B: 第一性原理分析
 
-**Only AFTER identifying root cause:**
-1. Propose solution that addresses the root cause
-2. Ensure solution aligns with user's actual goal
-3. Plan verification steps
+**三步法**：
 
-### Phase 4: Verification Plan
+1. **拆解到基本真理**
+   ```
+   问题: 页面加载需要 10 秒
 
-**Standard Verification:**
-1. Read the code you modified
-2. Use Grep to check for similar issues
-3. Run tests with Bash
-4. Test the specific broken behavior
+   基本真理分析:
+   - 网络传输: 1MB / 10Mbps = 0.8s
+   - DOM 渲染: 1000 个元素 = 1-2s
+   - JavaScript 执行: 5s
 
-**🔴 Production Verification (for deployed apps):**
+   → 问题不在网络，在 JavaScript
+   ```
+
+2. **质疑所有假设**
+   ```
+   假设质疑:
+   - "我们需要加载 1000 条数据吗？"
+     → 用户实际只看前 20 条
+
+   - "我们需要在客户端渲染吗？"
+     → 可以服务端渲染
+
+   - "我们需要实时更新吗？"
+     → 可以缓存 5 分钟
+   ```
+
+3. **从零重建**
+   ```
+   重建方案:
+   - 分页加载（每页 20 条）
+   - 服务端渲染
+   - 添加缓存
+
+   → 不修复 JavaScript，而是减少数据量
+   → 结果: 10s → 0.5s
+   ```
+
+### Phase 4: 解决方案设计
+
+**基于 Layer 3 的四重选择**：
+
+1. **修复系统**：修改代码使行为符合期望
+2. **修改期望**：更新需求/文档，使期望符合实际
+3. **重构系统**：用第一性原理重新设计
+4. **接受差异**：记录为技术债务
+
+### Phase 5: 验证计划
+
+**标准验证**：
+1. 阅读修改的代码
+2. 使用 Grep 检查类似问题
+3. 运行测试
+4. 测试特定的错误行为
+
+**🔴 生产环境验证**（适用于已部署的应用）：
 
 ```bash
-# Step 1: Extract exact filename from user's error
-# User error: "index-FPRo3oei.js:18 API call failed"
+# Step 1: 从用户错误中提取确切的文件名
+# 用户错误: "index-FPRo3oei.js:18 API call failed"
 
-# Step 2: Check what HTML references
+# Step 2: 检查 HTML 引用了什么
 curl -s https://domain.com/ | grep -o "assets/index-.*\.js"
 
-# Step 3: Verify THAT specific file (NOT your local build!)
+# Step 3: 验证那个特定文件（不是你的本地构建！）
 curl -s https://domain.com/assets/index-FPRo3oei.js | grep "PATTERN"
 
-# Step 4: Cache-bust if needed
+# Step 4: 如需要，清除缓存
 curl -H "Cache-Control: no-cache" https://domain.com/assets/index-FPRo3oei.js
 ```
 
-**Critical Principles:**
-- Error messages contain the ONLY truth about production
-- Filenames/URLs/line numbers in errors are FACTS
-- Tool success ≠ Production reality (CDN/cache create gaps)
-- Verify what users ACTUALLY see, not what you THINK they see
+**关键原则**：
+- 错误信息包含关于生产环境的唯一真相
+- 错误中的文件名/URL/行号是事实
+- 工具成功 ≠ 生产现实（CDN/缓存会产生差距）
+- 验证用户实际看到的内容，而不是你认为他们看到的
 
 ---
 
-## 📋 Example: Good vs Bad Debugging
+## 📋 案例对比：5 Whys vs 第一性原理
 
-### ❌ BAD: Symptom-Focused
+### 案例 1: API 查询慢
 
-```
-User: "My page loads slowly"
-Assistant: "Add caching to speed it up."
-
-Problems:
-- Didn't find root cause
-- Didn't verify what's actually slow
-- Can't verify if caching solves the real issue
-```
-
-### ✓ GOOD: Root Cause Analysis
+#### ❌ 仅用 5 Whys（陷阱）
 
 ```
-User: "My page loads slowly"
+问题: API 查询需要 10 秒
 
-Assistant:
-1. Read page code (Read tool)
-2. Check database queries (Grep for N+1 patterns)
-3. Found: N+1 query problem (150 queries instead of 2)
+5 Whys 分析:
+- 慢？ → 返回 1000 条记录
+- 1000 条？ → 没有分页
+- 没有分页？ → 产品要求显示全部
+- 产品要求？ → 需求文档这么写的
 
-5 Whys:
-- Slow? → 150 database queries
-- 150 queries? → Fetching user for each item
-- Fetching per item? → No eager loading
-- No eager loading? → Missing .include()
+SOLUTION: 添加分页（但需要改产品、前端、后端）
+```
 
-ROOT CAUSE: Missing eager loading
+**问题**：5 Whys 找到了根因（缺少分页），但这是在"现有框架内优化"。
 
-Solution: Add .include('user')
-Verify: Run query, confirm only 2 queries
+#### ✅ 用第一性原理（突破）
+
+```
+问题: API 查询需要 10 秒
+
+第一性原理分析:
+
+基本真理:
+- 数据库查询: 1000 条记录 = 5s
+- 网络传输: 1MB / 10Mbps = 0.8s
+- 人眼处理: 只能同时看 10-20 条
+
+质疑假设:
+- "用户真的需要 1000 条吗？"
+  → 观察: 99% 用户只看前 20 条
+
+- "为什么是一次性查询？"
+  → 假设: 用户需要浏览全部
+  → 真相: 用户需要搜索/筛选，而不是浏览
+
+重建方案:
+- 方案 A: 添加搜索/筛选（不是分页）
+- 方案 B: 无限滚动（不是一次性加载）
+- 方案 C: 懒加载（按需加载）
+
+结果: 不是"修复查询性能"，而是"重新设计交互"
+```
+
+### 案例 2: 数据库连接耗尽
+
+#### ✅ 用 5 Whys（合适）
+
+```
+问题: API 500 错误，数据库连接池耗尽
+
+5 Whys 分析:
+- 耗尽？ → 连接未关闭
+- 未关闭？ → 错误路径没调用 close()
+- 没调用？ → 缺少 finally 块
+
+SOLUTION: 添加 finally 块确保连接关闭
+```
+
+**为什么 5 Whys 合适？**
+- 明确的错误（异常）
+- 实现问题，不是设计问题
+- 修复路径清晰
+
+### 案例 3: 系统内存泄漏
+
+#### 🔄 混合使用（最佳实践）
+
+```
+问题: 运行 1 小时后内存溢出
+
+Step 1: 先用 5 Whys 找根因
+- 溢出？ → 缓存无限增长
+- 增长？ → 没有清理机制
+- 没清理？ → 设计时没考虑
+
+Step 2: 切换到第一性原理质疑设计
+基本真理:
+- 缓存是为了加速
+- 但缓存有内存成本
+
+质疑假设:
+- "我们需要缓存所有数据吗？"
+  → 只缓存热点数据（20/80 法则）
+
+- "为什么是内存缓存？"
+  → 可以用 Redis
+
+重建方案:
+- 不修复"清理机制"
+- 改用 LRU 淘汰策略
+- 或迁移到 Redis
+
+结果: 不是"修复泄漏"，而是"重新设计缓存策略"
 ```
 
 ---
 
-## ⚠️ Common Pitfalls
+## 🎯 决策指南：何时用哪种方法
 
-1. **Guessing instead of reading** - Always Read actual code first
-2. **Treating symptoms** - Use 5 Whys to find root cause
-3. **Ignoring user goals** - Ask what they're really trying to do
-4. **No verification** - Always plan how to test the fix
-5. **Premature solutions** - Don't propose solutions until you understand
+### 使用 5 Whys（轨道 A）：
 
-### 🔴 Production Pitfalls
+- ✅ 明确的错误/异常
+- ✅ 系统行为符合设计，但实现有误
+- ✅ 快速故障排查
+- ✅ 生产环境事故
 
-6. **Trusting "build artifacts" over "runtime errors"**
-   - ❌ "Local build looks correct"
-   - ✅ "User's error shows file ABC.js, let me check THAT file"
+**示例**：
+- NPE、500 错误、超时
+- 权限错误、配置错误
+- 数据丢失、损坏
 
-7. **Believing deployment tools**
-   - ❌ "Wrangler says deployed successfully"
-   - ✅ "Let me verify what's actually being served"
+### 使用第一性原理（轨道 B）：
 
-8. **Ignoring the cache layer**
-   - ❌ "I deployed, users should see it"
-   - ✅ "CDN might cache old files, let me verify"
+- ✅ 性能问题（慢、卡顿）
+- ✅ 复杂交互问题
+- ✅ 设计可能有问题
+- ✅ 5 Whys 找不到满意答案
+- ✅ 需要 10x 优化而非 10% 优化
+
+**示例**：
+- 页面加载慢
+- 数据处理慢
+- 系统复杂度高
+- 需要创新突破
+
+### 混合使用（先 A 后 B）：
+
+1. **先用 5 Whys**（5 分钟内定位）
+   - 如果找到明确的实现错误 → 修复
+   - 如果找到"设计问题" → 切换到第一性原理
+
+2. **再用第一性原理**（深度重建）
+   - 质疑设计假设
+   - 重新思考问题本质
+   - 从零设计新方案
 
 ---
 
-## 🎯 Quick Reference
+## ⚠️ 常见误区
 
-When you encounter a problem:
+### ❌ 误区 1: 第一性原理 = 5 Whys
 
-1. **STOP** - Don't propose a solution yet
-2. **READ** - Use Read tool to examine code
-3. **SEARCH** - Use Grep to find patterns
-4. **ASK** - Use 5 Whys to find root cause
-5. **VERIFY** - Use tools to confirm understanding
-6. **ALIGN** - Ensure solution matches user's goal
-7. **TEST** - Verify the fix actually works
+| **5 Whys** | **第一性原理** |
+|---|---|
+| 方向: 自顶向下 | 方向: 自底向上 |
+| 目标: 找到根本原因 | 目标: 从零重建 |
+| 提问: "为什么？" | 提问: "基本真理是什么？" |
+| 适用: 调试、故障排查 | 适用: 创新、突破、性能优化 |
+| 示例: 找出为什么页面加载慢 | 示例: 重新设计数据传输方式 |
 
-**Remember: Use tools to investigate, use tools to verify. Never assume.**
+### ❌ 误区 2: 第一性原理 = 忽略现有系统
+
+```
+错误: "假设没有限制，从零设计"
+正确: "理解现有系统，但质疑其设计假设"
+```
+
+### ❌ 误区 3: 所有问题都用第一性原理
+
+```
+错误: "简单的 NPE 也要质疑整个系统设计"
+正确: "明确的实现错误用 5 Whys，设计问题用第一性原理"
+```
 
 ---
 
-## 🔄 Multiple Solution Strategy (Bounded Depth-First)
+## 🛠️ 工具使用指南
 
-When debugging, consider multiple solutions upfront:
+### 调查阶段（所有方法通用）
 
-**Example Problem**: "API returns 500 error"
+**Read 工具**：
+- ✅ 读取实际代码/配置
+- ❌ 不要基于记忆或假设
 
-**Possible solutions**:
-1. Database connection issue
-2. API endpoint bug
-3. Configuration error
+**Grep 工具**：
+- ✅ 搜索相关代码模式
+- ✅ 检查类似问题
 
-**Strategy**:
+**Bash 工具**：
+- ✅ 查看日志、进程
+- ✅ 测试假设
+- ✅ 验证生产环境
+
+### 第一性原理专用技巧
+
+**使用 Bash 测试基本真理**：
+```bash
+# 测试网络延迟基本限制
+time curl https://api.example.com/endpoint
+
+# 测试数据库查询基本性能
+time mysql -e "SELECT * FROM large_table LIMIT 1000"
+
+# 测试数据传输基本速度
+dd if=/dev/zero of=test.dat bs=1M count=100
 ```
-Solution A, attempt 1 → Failed
-Solution A, attempt 2 → Failed
-Solution A, attempt 3 → Failed
-→ Switch to Solution B (max 3 attempts per solution)
 
-Solution B, attempt 1 → Failed
-Solution B, attempt 2 → SUCCESS!
-→ Problem solved
+**使用 Read 理解设计假设**：
+- 查看注释、文档、需求
+- 理解"为什么这样设计"
+- 找到可以质疑的假设
+
+---
+
+## 🔄 工作流程总结
+
+### 完整流程图
+
+```
+1. 接收问题
+   ↓
+2. 信息收集 (Read/Grep/Bash)
+   ↓
+3. 问题分类决策
+   ↓
+   ├─ 明确错误？ → 轨道 A (5 Whys)
+   │    ↓
+   │    ├─ 找到实现错误 → 修复 → 验证
+   │    └─ 发现设计问题 → 轨道 B
+   │
+   └─ 性能/设计问题？ → 轨道 B (第一性原理)
+        ↓
+        ├─ 拆解到基本真理
+        ├─ 质疑所有假设
+        ├─ 从零重建方案
+        └─ 选择解决路径
+             ↓
+             ├─ 修复系统
+             ├─ 修改期望
+             ├─ 重构系统
+             └─ 接受差异
+   ↓
+4. 验证（生产环境 + 标准测试）
+   ↓
+5. 文档化（决策依据 + 解决方案）
 ```
 
-**Benefits**:
-- Breadth-first exploration before going deep
-- Avoid tunnel vision
-- Skip obviously wrong approaches after 3 failures
+---
+
+## 💡 关键洞察
+
+1. **5 Whys 和第一性原理是互补的，不是互斥的**
+   - 5 Whys: 快速定位实现错误
+   - 第一性原理: 深度质疑设计假设
+
+2. **问题分类比解决问题更重要**
+   - 错误的方法会浪费时间
+   - 先分类，再选择方法
+
+3. **不是所有问题都需要"修复"**
+   - 修改期望可能更合适
+   - 重构系统可能是更好选择
+   - 接受差异有时是最优解
+
+4. **工具是用来收集事实，不是验证假设**
+   - 用 Read 看实际代码
+   - 用 Bash 测试实际行为
+   - 用 Grep 找相关模式
+
+5. **生产环境验证是最后的防线**
+   - 错误信息包含唯一真理
+   - 文件名、URL、行号是事实
+   - 工具成功 ≠ 生产正确
+
+---
+
+## 🎯 快速参考
+
+### 问题分类决策树
+
+```
+开始
+  ↓
+是否有明确错误/异常？
+  ├─ YES → 使用 5 Whys
+  │         ↓
+  │       是实现错误？
+  │         ├─ YES → 修复系统
+  │         └─ NO  → 切换到第一性原理
+  │
+  └─ NO → 使用第一性原理
+           ↓
+         性能/设计问题？
+           ├─ YES → 质疑框架 → 重建
+           └─ NO  → 重新分类
+```
+
+### 关键问题清单
+
+**在 Layer 1（问题分类）问**：
+1. "这是行为错误还是设计理解错误？"
+2. "这是框架内修复还是需要质疑框架？"
+3. "用户的真实目标是什么？"
+
+**在轨道 A（5 Whys）问**：
+1. "为什么会出现这个错误？"（连问 5 次）
+2. "这是症状还是根因？"
+3. "如何修复这个实现错误？"
+
+**在轨道 B（第一性原理）问**：
+1. "基本真理是什么？"
+2. "哪些是物理法则，哪些只是假设？"
+3. "如果从零开始，会怎么做？"
+
+**在 Layer 3（解决路径）问**：
+1. "应该修复系统、修改期望、重构系统，还是接受差异？"
+
+---
+
+## ⚠️ 常见陷阱
+
+1. **猜测而不是阅读** - 始终使用 Read 工具查看实际代码
+2. **治疗症状** - 使用 5 Whys 或第一性原理找到根因
+3. **忽略用户目标** - 询问他们真正想要完成什么
+4. **没有验证** - 始终计划如何测试修复
+5. **过早的解决方案** - 在理解之前不要提出解决方案
+
+### 🔴 生产环境陷阱
+
+6. **信任"构建产物"而非"运行时错误"**
+   - ❌ "本地构建看起来正确"
+   - ✅ "用户的错误显示文件 ABC.js，让我检查那个文件"
+
+7. **相信部署工具**
+   - ❌ "Wrangler 说部署成功"
+   - ✅ "让我验证实际提供的内容"
+
+8. **忽略缓存层**
+   - ❌ "我部署了，用户应该看到了"
+   - ✅ "CDN 可能缓存了旧文件，让我验证"
+
+---
+
+## 📚 与其他技能的协作
+
+### Debug + First-Principles
+
+```
+Debug 技能发现问题分类后：
+- 如果需要第一性原理分析
+  → 自动调用 first-principles 技能
+  → 第一性原理分析完成后
+  → 返回 debug 技能进行验证
+```
+
+### Debug + First-Principles-Planner
+
+```
+如果调试发现需要重构系统：
+- 使用第一性原理分析后
+- 发现需要重新设计功能
+- 调用 first-principles-planner 制定实施计划
+```
+
+### 完整技能栈
+
+| 场景 | 使用技能 |
+|---|---|
+| 系统出错/故障 | **debug** (5 Whys) |
+| 性能/设计问题 | **debug** → **first-principles** |
+| 需要重构系统 | **debug** → **first-principles** → **first-principles-planner** |
+| 产品规划 | **first-principles-planner** |
+| 创新突破 | **first-principles** |
 
 ---
 
