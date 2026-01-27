@@ -1,11 +1,13 @@
 ---
 name: debug
-description: 系统化问题解决技能 - 整合 5 Whys 根因分析和第一性原理重建思维，提供三层问题解决模型、双轨调试方法、生产环境验证和工具使用指南。适用于故障排查、性能优化、系统重构和创新突破。
+description: 系统化问题解决技能 - 整合 5 Whys 根因分析、第一性原理重建思维和本地错题集，提供三层问题解决模型、双轨调试方法、生产环境验证、工具使用指南和经验积累。适用于故障排查、性能优化、系统重构和创新突破。
 ---
 
 # Debug Skill
 
 > **CRITICAL**: 在提出任何解决方案之前，必须通过此框架进行问题分析和路径选择。
+>
+> **NEW**: 本技能会自动维护项目的"错题集"（`.claude/debug-experiences/`），记录每次调试的成功和失败经验，持续积累项目特定的 debug 智慧。
 
 ---
 
@@ -31,24 +33,57 @@ description: 系统化问题解决技能 - 整合 5 Whys 根因分析和第一�
 
 #### 轨道 A: 5 Whys 根因分析（自顶向下）
 
+**什么是 5 Whys？**
+
+5 Whys 是由丰田佐吉提出的根因分析方法。核心是通过**连续问至少 5 次"为什么"**，层层深入，从现象到根本原因。
+
+**5 Whys 的本质**：
+```
+不是: 问"为什么错了5次"（这是误解）
+而是: 通过问5次为什么，找到可以采取行动的根因
+
+第1个Why → 症状/现象（表面问题）
+第2个Why → 直接原因
+第3个Why → 间接原因
+第4个Why → 深层原因
+第5个Why → 根本原因（可采取行动）
+```
+
 **适用于**：
 - ✅ 明确的错误/异常
 - ✅ 系统行为与设计意图不符
 - ✅ 需要快速定位实现问题
 - ✅ 已知设计是正确的
 
-**方法**：
+**方法示例**：
 ```
 问题: API 返回 500 错误
-Why 1? → 数据库查询超时
-Why 2? → 连接池耗尽
-Why 3? → 连接未关闭
-Why 4? → 错误路径没调用 connection.close()
-Why 5? → 缺少 finally 块
+
+Why 1? → 为什么返回 500？数据库查询超时
+Why 2? → 为什么超时？连接池耗尽
+Why 3? → 为什么耗尽？连接未关闭
+Why 4? → 为什么未关闭？错误路径没调用 close()
+Why 5? → 为什么没调用？缺少 finally 块
 
 ROOT CAUSE: 缺少 finally 块来关闭连接
 SOLUTION: 添加 finally 块
 ```
+
+**关键要点**：
+1. **每一层的答案都是下一层的问题**
+   - "数据库查询超时" → "为什么超时？"
+
+2. **第5个Why后必须能采取行动**
+   - 如果第5个Why后还是"不知道"，继续问Why 6、Why 7...
+   - 直到找到可以行动的根本原因
+
+3. **区分症状和根本原因**
+   - ❌ Symptom: "API返回500"（第1层）
+   - ✅ Root cause: "缺少finally块"（第5层）
+
+4. **避免推诿式"Why"**
+   - ❌ "为什么没人检查代码？" → 这是责怪，不是根因
+   - ✅ "为什么缺少finally块？" → 这是技术根因
 
 #### 轨道 B: 第一性原理重建（自底向上）
 
@@ -118,6 +153,133 @@ SOLUTION: 添加 finally 块
 - **Glob** - 查找所有相关文件
 - **Bash** - 检查日志、进程、测试行为
 
+### Phase 1.5: 经验检索（智能激活）
+
+**语义信号检测**：
+
+当检测到以下信号时，**自动激活 debug skill + 查询错题集**：
+
+#### 🔴 强信号（立即激活，不询问）
+
+1. **错误代码/堆栈跟踪**
+   ```
+   Error: API returned 500
+       at API.handler (api.js:123)
+   TypeError: Cannot read property 'data'
+   ```
+
+2. **明确的 debug 关键词**
+   ```
+   "帮我 debug 一下"
+   "这个 bug 怎么修复"
+   "为什么会报这个错误"
+   "遇到了奇怪的问题"
+   ```
+
+3. **错误日志片段**
+   ```
+   [ERROR], [WARN], Exception, Failed, Timeout
+   ```
+
+#### 🟡 中等信号（询问后激活）
+
+1. **性能/行为问题**
+   ```
+   "API 响应太慢"
+   "页面加载卡顿"
+   "内存占用持续增长"
+   "间歇性出现错误"
+   ```
+
+**AI 行为**：询问"看起来是性能/行为问题，是否启动 debug skill？[Y/n]"
+
+#### 🟢 弱信号（不激活）
+
+- 开发任务："如何实现用户登录？"
+- 咨询学习："什么是 N+1 问题？"
+
+**错题集查询流程**：
+
+```
+Step 1: 检查错题集是否存在
+├─ 如果不存在 → 跳到 Phase 2（首次使用）
+└─ 如果存在 → 继续
+
+Step 2: 读取 INDEX（轻量级）
+├─ 使用 head -n 50 读取前 50 行（< 100 tokens）
+└─ 提取高频问题 + 最近 7 天经验
+
+Step 3: 相关性匹配
+├─ 提取当前问题特征（错误类型、组件、标签）
+├─ 计算 similarity score（频率 40% + 时间 30% + 标签 30%）
+└─ 选择 Top 3-5 条相关经验
+
+Step 4: 展示相关经验
+├─ ⭐ 高频错误（≥ 3 次）→ 总是展示
+├─ 📅 最近 7 天 → 总是展示
+├─ 🏷️ 标签匹配度 ≥ 50% → 展示
+└─ ⚠️  失败经验标记为"避免此路径"
+
+Step 5: 用户交互
+AI: "🔍 发现 3 条相关经验：
+     [SUCCESS] API Timeout (高频，第 5 次)
+     [FAILURE] Redis Cache（避免此路径）
+     是否参考这些经验？[Y/n] (默认: Y)"
+```
+
+**智能匹配逻辑**：
+
+```bash
+# 示例：用户遇到 API 超时问题
+current_tags = ["api", "timeout", "performance"]
+
+# 搜索 INDEX 中的相关经验
+grep -E "(api|timeout|performance)" .claude/debug-experiences/INDEX.md
+
+# 优先级排序
+1. 频率优先（出现 5 次的 > 出现 1 次的）
+2. 时间优先（最近 7 天 > 1 个月前）
+3. 标签匹配（3 个标签都匹配 > 1 个标签匹配）
+
+# 最多展示 5 条，避免信息过载
+```
+
+**分层架构**（避免 token 浪费）：
+
+```
+.claude/debug-experiences/
+├── INDEX.md                    # 轻量级索引（高频 + 最近）
+│   ├── ## 🔥 High-Frequency Issues
+│   └── ## 📅 Last 7 Days
+├── 2025-01-15-api-timeout.md   # 详细经验（按需读取）
+└── 2025-01-10-redis-cache.md   # 失败经验（避免路径）
+```
+
+**查询工具使用**：
+
+```bash
+# 快速扫描 INDEX（只读前 50 行）
+head -n 50 .claude/debug-experiences/INDEX.md
+
+# 搜索特定标签
+grep -i "api.*timeout" .claude/debug-experiences/INDEX.md
+
+# 按需读取详细经验（仅读相关的 3-5 条）
+Read .claude/debug-experiences/2025-01-15-api-timeout.md
+```
+
+**首次使用**：
+
+- 如果 `.claude/debug-experiences/` 不存在
+- 自动跳过经验查询
+- 正常执行 Phase 2
+- 在 Phase 5.5 自动创建错题集
+
+**可选禁用**：
+
+- 用户可使用 `--no-history` flag 强制跳过错题集查询
+- 或直接回答 'n' 跳过经验参考
+
 ### Phase 2: 问题分类（选择轨道）
 
 **使用决策树**：
@@ -142,20 +304,34 @@ SOLUTION: 添加 finally 块
 
 #### 轨道 A: 5 Whys 根因分析
 
-应用 **5 Whys 技术** - 连问至少 5 次"为什么"：
+**应用 5 Whys 技术** - 通过连续问 5 次"为什么"，从现象深入到根本原因：
 
 ```
 PROBLEM: API returns 500 error
-Why 1? → Database query times out
-Why 2? → Connection pool is exhausted
-Why 3? → Connections aren't being closed
-Why 4? → Error path doesn't call connection.close()
-Why 5? → Missing finally block in error handling
+
+Why 1? 为什么返回 500？
+→ Database query times out（数据库查询超时）
+
+Why 2? 为什么超时？
+→ Connection pool is exhausted（连接池耗尽）
+
+Why 3? 为什么耗尽？
+→ Connections aren't being closed（连接没有被关闭）
+
+Why 4? 为什么没有被关闭？
+→ Error path doesn't call connection.close()（错误路径没有调用关闭方法）
+
+Why 5? 为什么没有调用关闭方法？
+→ Missing finally block in error handling（缺少 finally 块）
 
 ROOT CAUSE: Missing finally block to close connections
+（可以通过添加 finally 块来解决的根因）
 ```
 
-**区分症状 vs 根本原因**：
+**关键原则**：
+1. 每一层的答案都是下一层的"为什么"问题
+2. 第 5 个 Why 后必须能采取行动（继续问直到找到可行动的根因）
+3. 区分症状（第 1 层）和根本原因（第 5 层）
 - ❌ Symptom: "页面加载缓慢"
 - ✅ Root cause: "未优化的 N+1 数据库查询"
 
@@ -238,27 +414,304 @@ curl -H "Cache-Control: no-cache" https://domain.com/assets/index-FPRo3oei.js
 - 工具成功 ≠ 生产现实（CDN/缓存会产生差距）
 - 验证用户实际看到的内容，而不是你认为他们看到的
 
+### Phase 5.5: 经验记录（持续积累）
+
+**记录时机**：
+- Debug 完成后（验证通过）
+- 记录到 `.claude/debug-experiences/`
+- 首次使用时自动创建目录结构
+
+**目录结构**：
+
+```bash
+# 首次使用时创建
+mkdir -p .claude/debug-experiences
+
+# 创建 INDEX.md（如果不存在）
+touch .claude/debug-experiences/INDEX.md
+
+# 创建新的经验文件
+touch .claude/debug-experiences/YYYY-MM-DD-short-description.md
+```
+
+**记录模板**：
+
+```markdown
+# [SUCCESS/FAILURE] YYYY-MM-DD: Short Description
+
+**Problem**
+- What happened?
+- Error messages?
+- Impact on users?
+
+**Tags**
+- type: error | performance | design | behavior
+- component: api | database | frontend | worker | cache
+- method: 5-whys | first-principles
+- impact: high | medium | low
+
+**Investigation Method**
+- Track A (5 Whys) or Track B (First Principles)?
+- Why did you choose this method?
+
+**Root Cause**
+- What was the actual underlying issue?
+
+**Solution Path**
+- Fix System | Modify Expectations | Reconstruct System | Accept Difference
+- Why this path?
+
+**Solution Details**
+- What did you change?
+- Code changes?
+- Configuration changes?
+- Architecture changes?
+
+**Verification**
+- How did you verify it worked?
+- Metrics before/after?
+- Test results?
+
+**Lessons Learned** (for FAILURE)
+- Why did this approach fail?
+- What should be avoided in the future?
+- What would you do differently?
+
+**Related Files**
+- Files modified
+- Documentation updated
+- Related issues
+
+**Occurrences**
+- First occurrence: YYYY-MM-DD
+- Last occurrence: YYYY-MM-DD
+- Frequency: X times
+```
+
+**INDEX.md 更新**：
+
+每次记录新经验后，更新 `INDEX.md`：
+
+```markdown
+# Debug Experiences Index
+
+## 🔥 High-Frequency Issues (≥ 3 occurrences)
+
+### [Type] Component Issue - X occurrences
+**Last**: YYYY-MM-DD
+**Pattern**: Quick pattern description
+**Quick Fix**: One-line solution
+**Recent File**: [detail](YYYY-MM-DD-issue.md)
+
+---
+
+## 📅 Last 7 Days
+
+### [SUCCESS] YYYY-MM-DD: Issue Description
+**Tags**: tag1, tag2, tag3
+**Method**: 5 Whys / First Principles
+**Lesson**: One-line lesson
+→ [Read more](YYYY-MM-DD-issue.md)
+
+### [FAILURE] YYYY-MM-DD: Failed Attempt
+**Why Failed**: Brief reason
+**Lesson**: What to avoid
+→ [Read more](YYYY-MM-DD-failure.md)
+
+---
+
+## 🏷️ By Tag
+
+### performance (X)
+- [Issue 1] YYYY-MM-DD
+- [Issue 2] YYYY-MM-DD
+
+### api (Y)
+- [Issue 3] YYYY-MM-DD
+
+### database (Z)
+- [Issue 4] YYYY-MM-DD
+```
+
+**成功经验示例**：
+
+```markdown
+# [SUCCESS] 2025-01-15: API Timeout (N+1 Query)
+
+**Problem**
+- API calls to `/api/posts` timeout after 30 seconds
+- Users experiencing errors, 500 status
+- Impact: High (core feature affected)
+
+**Tags**
+- type: error
+- component: api, database
+- method: 5-whys
+- impact: high
+
+**Investigation Method**
+- Track A (5 Whys) - Clear error with stack trace
+- Chose 5 Whys because explicit error indicated implementation issue
+
+**Root Cause**
+- N+1 query problem
+- Fetching posts (1 query) + user for each post (N queries)
+- Total: 1 + 1000 = 1001 queries for 1000 posts
+
+**Solution Path**
+- Fix System - Implementation error, design was correct
+- Added eager loading with `.include('user')`
+
+**Solution Details**
+- Changed: `Post.findAll()` → `Post.findAll({ include: ['user'] })`
+- Reduced queries: 1001 → 2
+- Files modified: `api/posts.js`
+
+**Verification**
+- Before: 30s timeout, 1001 queries
+- After: 200ms response, 2 queries
+- Tested with 1000 posts
+- Production verified: no errors in 24h
+
+**Lessons Learned**
+- Always check for N+1 queries first when dealing with performance
+- ORM eager loading is simpler than caching
+
+**Occurrences**
+- First occurrence: 2025-01-02
+- Last occurrence: 2025-01-15
+- Frequency: 5 times (same pattern in different endpoints)
+```
+
+**失败经验示例**：
+
+```markdown
+# [FAILURE] 2025-01-10: Redis Cache for API
+
+**Problem**
+- API response slow (10 seconds)
+- Attempted to add Redis caching layer
+
+**Tags**
+- type: performance
+- component: api, cache
+- method: first-principles
+- impact: medium
+
+**Investigation Method**
+- Track B (First Principles) - Performance issue, unclear root cause
+- Questioned: "Do we need to query database every time?"
+
+**Attempted Solution**
+- Added Redis cache with 5-minute TTL
+- Cache-aside pattern implementation
+
+**Why It Failed**
+1. **Cache Invalidation Complexity**
+   - Data changes frequently
+   - Stale data caused user complaints
+   - Complex invalidation logic required
+
+2. **Operational Overhead**
+   - Redis maintenance
+   - Cache debugging complexity
+   - Increased system complexity
+
+3. **Rollback Required**
+   - Users reported data inconsistency
+   - Rolled back after 1 week
+   - Lost development time
+
+**Lessons Learned**
+- Always plan cache invalidation strategy BEFORE implementation
+- N+1 query fix (0.2s) was simpler than cache (complexity)
+- Cache introduces operational costs
+
+**Avoid**
+- Using Redis for this use case (frequently changing data)
+- Caching without clear invalidation strategy
+
+**Better Alternative**
+- Fixed N+1 query instead: 30s → 0.2s
+- No cache needed, simpler solution
+
+**Occurrences**
+- First occurrence: 2025-01-10
+- Frequency: 1 (attempted once, learned lesson)
+```
+
+**记录工具使用**：
+
+```bash
+# 创建新经验文件
+cat > .claude/debug-experiences/2025-01-15-api-timeout.md << 'EOF'
+[Paste template]
+EOF
+
+# 更新 INDEX.md
+# 在 ## 🔥 High-Frequency Issues 添加（如果频率 ≥ 3）
+# 在 ## 📅 Last 7 Days 添加
+# 在 ## 🏷️ By Tag 添加
+
+# 提交到 Git（可选）
+git add .claude/debug-experiences/
+git commit -m "docs: add debug experience - API timeout"
+```
+
+**自动创建流程**：
+
+```
+首次 Debug:
+1. Phase 1.5: 检测到 `.claude/debug-experiences/` 不存在
+2. 跳过错题集查询
+3. 执行 Phase 2-5 正常流程
+4. Phase 5.5: 自动创建目录 + INDEX.md + 第一条经验
+
+后续 Debug:
+1. Phase 1.5: 读取 INDEX，查询相关经验
+2. Phase 2-5: 参考历史经验进行 debug
+3. Phase 5.5: 记录新经验，更新 INDEX
+```
+
+**团队协作**：
+
+- 错题集可以通过 Git 共享
+- 团队成员可以互相参考经验
+- 形成团队的"知识库"
+- 建议在 `.gitignore` 中**不忽略** `.claude/debug-experiences/`
+
+**向后兼容**：
+
+- ✅ 首次使用无感知（自动创建）
+- ✅ 老项目可以手动创建（可选）
+- ✅ 不影响现有 debug 流程
+- ✅ 可通过 `--no-history` 禁用
+
 ---
 
 ## 📋 案例对比：5 Whys vs 第一性原理
 
 ### 案例 1: API 查询慢
 
-#### ❌ 仅用 5 Whys（陷阱）
+#### ❌ 错误的方法选择（误用 5 Whys）
 
 ```
 问题: API 查询需要 10 秒
 
-5 Whys 分析:
+错误地使用 5 Whys:
 - 慢？ → 返回 1000 条记录
 - 1000 条？ → 没有分页
 - 没有分页？ → 产品要求显示全部
 - 产品要求？ → 需求文档这么写的
 
-SOLUTION: 添加分页（但需要改产品、前端、后端）
+错误结论: "添加分页"（但这是需求/设计问题，不是实现错误）
 ```
 
-**问题**：5 Whys 找到了根因（缺少分页），但这是在"现有框架内优化"。
+**问题分析**：
+- ❌ **这不是 5 Whys 的问题，而是方法选择错误**
+- ❌ "性能问题"应该用第一性原理，而不是 5 Whys
+- ❌ 当 5 Whys 推导到"需求文档这么写"时，说明已经超出了 5 Whys 的适用范围
+- ✅ **正确的做法**：在 Phase 1 就识别出这是"性能问题"，直接使用轨道 B（第一性原理）
 
 #### ✅ 用第一性原理（突破）
 
@@ -310,34 +763,55 @@ SOLUTION: 添加 finally 块确保连接关闭
 
 ### 案例 3: 系统内存泄漏
 
-#### 🔄 混合使用（最佳实践）
+#### ✅ 正确的方法选择（直接用第一性原理）
 
 ```
 问题: 运行 1 小时后内存溢出
 
-Step 1: 先用 5 Whys 找根因
-- 溢出？ → 缓存无限增长
-- 增长？ → 没有清理机制
-- 没清理？ → 设计时没考虑
+Phase 1 分类:
+1. 这是"系统行为错误"还是"设计理解错误"？
+   → 行为错误（内存溢出）
+2. 这是"在现有框架内修复"还是"需要质疑框架"？
+   → 需要质疑框架（缓存设计本身有问题）
+3. 用户的真实目标是什么？
+   → 系统稳定运行，不希望内存溢出
 
-Step 2: 切换到第一性原理质疑设计
+结论: 使用轨道 B（第一性原理）
+
+第一性原理分析:
 基本真理:
 - 缓存是为了加速
 - 但缓存有内存成本
+- 内存是有限的
 
 质疑假设:
 - "我们需要缓存所有数据吗？"
-  → 只缓存热点数据（20/80 法则）
+  → 观察: 只缓存热点数据（20/80 法则）
 
 - "为什么是内存缓存？"
   → 可以用 Redis
 
 重建方案:
-- 不修复"清理机制"
+- 不修复"清理机制"（这只是在错误的基础上修补）
 - 改用 LRU 淘汰策略
 - 或迁移到 Redis
 
 结果: 不是"修复泄漏"，而是"重新设计缓存策略"
+```
+
+**为什么不用 5 Whys？**
+- ❌ 5 Whys 会推导到"没清理机制" → "添加清理机制"
+- ❌ 这是在错误的设计上修补，而不是质疑设计本身
+- ✅ 正确做法：识别这是"设计问题"，直接用第一性原理
+
+**错误示例**（如果误用 5 Whys）：
+```
+5 Whys（错误的方法选择）:
+- 溢出？ → 缓存无限增长
+- 增长？ → 没有清理机制
+- 没清理？ → 设计时没考虑
+
+结论: "添加清理机制"（治标不治本）
 ```
 
 ---
@@ -372,20 +846,51 @@ Step 2: 切换到第一性原理质疑设计
 
 ### 混合使用（先 A 后 B）：
 
-1. **先用 5 Whys**（5 分钟内定位）
-   - 如果找到明确的实现错误 → 修复
-   - 如果找到"设计问题" → 切换到第一性原理
+**注意**：这不是"先用 5 Whys，不行再换第一性原理"，而是：
+1. **在 Phase 1 就正确分类**，直接选择合适的方法
+2. **如果不确定，可以先用 5 Whys 快速试探**（5 分钟内）
+   - 如果 5 Whys 推导到"需求"、"产品决策"等非实现层面
+   - **立即停止，切换到第一性原理**（说明这不是实现错误）
+   - 如果找到明确的代码/配置错误 → 继续用 5 Whys
 
-2. **再用第一性原理**（深度重建）
-   - 质疑设计假设
-   - 重新思考问题本质
-   - 从零设计新方案
+**关键判断**：
+- ✅ 5 Whys 第 3-5 问就能到代码层面 → 继续用 5 Whys
+- ❌ 5 Whys 第 2-3 问就到"产品/需求"层面 → 应该用第一性原理
 
 ---
 
 ## ⚠️ 常见误区
 
-### ❌ 误区 1: 第一性原理 = 5 Whys
+### ❌ 误区 1: 滥用 5 Whys（用错方法）
+
+**错误做法**：
+```
+问题: API 响应慢（10 秒）
+直接用 5 Whys:
+- 慢？ → 返回 1000 条
+- 1000 条？ → 没有分页
+- 没分页？ → 产品要求
+→ 结论: "添加分页"（但这不是实现错误！）
+```
+
+**问题分析**：
+- ❌ **这是方法选择错误，不是 5 Whys 的问题**
+- ❌ 性能问题应该用第一性原理，而不是 5 Whys
+- ❌ 当 5 Whys 推导到"产品/需求"层面时，说明选错方法了
+
+**正确做法**：
+```
+Phase 1 先分类:
+- 明确错误？ → NO（没有错误信息）
+- 性能问题？ → YES
+→ 直接用第一性原理（轨道 B）
+```
+
+**判断标准**：
+- ✅ 5 Whys 第 3-5 问能到代码层面 → 继续用
+- ❌ 5 Whys 第 2-3 问就到"需求/产品" → 应该用第一性原理
+
+### ❌ 误区 2: 第一性原理 = 5 Whys
 
 | **5 Whys** | **第一性原理** |
 |---|---|
@@ -395,14 +900,14 @@ Step 2: 切换到第一性原理质疑设计
 | 适用: 调试、故障排查 | 适用: 创新、突破、性能优化 |
 | 示例: 找出为什么页面加载慢 | 示例: 重新设计数据传输方式 |
 
-### ❌ 误区 2: 第一性原理 = 忽略现有系统
+### ❌ 误区 3: 第一性原理 = 忽略现有系统
 
 ```
 错误: "假设没有限制，从零设计"
 正确: "理解现有系统，但质疑其设计假设"
 ```
 
-### ❌ 误区 3: 所有问题都用第一性原理
+### ❌ 误区 4: 所有问题都用第一性原理
 
 ```
 错误: "简单的 NPE 也要质疑整个系统设计"
@@ -454,9 +959,21 @@ dd if=/dev/zero of=test.dat bs=1M count=100
 ### 完整流程图
 
 ```
-1. 接收问题
+1. 接收问题 / 语义信号检测
    ↓
 2. 信息收集 (Read/Grep/Bash)
+   ↓
+2.5. 经验检索（智能激活）⭐ NEW
+   ├─ 检测错题集是否存在？
+   │  ├─ 不存在 → 跳到 Step 3
+   │  └─ 存在 → 继续
+   ├─ 读取 INDEX 前 50 行
+   ├─ 相关性匹配（标签/关键词/频率）
+   ├─ 展示 Top 3-5 条相关经验
+   │  ├─ ⭐ 高频错误（≥ 3 次）
+   │  ├─ 📅 最近 7 天
+   │  └─ ⚠️  失败经验（避免此路径）
+   └─ 询问用户是否参考 [Y/n]
    ↓
 3. 问题分类决策
    ↓
@@ -479,7 +996,67 @@ dd if=/dev/zero of=test.dat bs=1M count=100
    ↓
 4. 验证（生产环境 + 标准测试）
    ↓
+4.5. 记录经验（持续积累）⭐ NEW
+   ├─ 创建/更新经验文件
+   │  ├─ [SUCCESS] / [FAILURE]
+   │  ├─ Problem, Tags, Root Cause, Solution
+   │  └─ Lessons Learned (失败)
+   ├─ 更新 INDEX.md
+   │  ├─ 高频问题（≥ 3 次）
+   │  ├─ 最近 7 天
+   │  └─ 标签索引
+   └─ 提交 Git（可选）
+   ↓
 5. 文档化（决策依据 + 解决方案）
+```
+
+### 语义激活流程
+
+```
+用户输入
+   ↓
+信号检测
+   ├─ 🔴 强信号（错误代码/堆栈跟踪）
+   │  → 自动激活 debug + 查询错题集
+   │
+   ├─ 🟡 中等信号（性能问题）
+   │  → 询问"是否启动 debug skill？"
+   │
+   └─ 🟢 弱信号（开发任务）
+      → 正常回答，不激活
+```
+
+### 错题集检索流程
+
+```
+开始 debug
+   ↓
+检查 .claude/debug-experiences/INDEX.md
+   ├─ 不存在 → 跳过（首次使用）
+   └─ 存在 → 继续
+      ↓
+读取 INDEX 前 50 行（< 100 tokens）
+   ↓
+提取当前问题特征
+   ├─ 错误类型（timeout/crash/leak）
+   ├─ 组件（api/database/worker）
+   └─ 关键词
+      ↓
+相关性匹配
+   ├─ 频率优先（出现 5 次 > 出现 1 次）
+   ├─ 时间优先（最近 7 天 > 1 个月前）
+   └─ 标签匹配（3 个标签 > 1 个标签）
+      ↓
+选择 Top 3-5 条
+   ↓
+展示并询问用户
+   ├─ ⭐ 高频错误 → "第 5 次出现，上次方案：..."
+   ├─ ⚠️  失败经验 → "避免此路径，上次失败原因：..."
+   └─ 📅 最近成功 → "7 天前解决过，方案：..."
+   ↓
+用户选择 [Y/n]
+   ├─ Y → 参考经验继续 debug
+   └─ n → 跳过，正常流程
 ```
 
 ---
