@@ -46,12 +46,12 @@
       ]
     },
     {
-      "name": "ralph-wiggum",
+      "name": "ralph-loop",
       "description": "基于 Bash 循环的 Ralph Wiggum 技术，让 AI 持续迭代直到完成所有任务。支持 Build 模式（一键启动）和 Plan 模式（交互式配置），跨平台支持（Linux/macOS/Windows），默认集成 debug skills 加速迭代。",
       "source": "./",
       "strict": false,
       "skills": [
-        "./general/ralph-wiggum"
+        "./general/ralph-loop"
       ]
     },
     {
