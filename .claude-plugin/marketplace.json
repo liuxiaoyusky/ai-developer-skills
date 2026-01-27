@@ -11,7 +11,7 @@
   "plugins": [
     {
       "name": "doc-auditor",
-      "description": "AI 辅助的项目文档审计工具",
+      "description": "AI 辅助的项目文档审计工具。扫描项目中的 Markdown 文档，收集上下文信息（Git 历史、文档结构、引用有效性），AI 分析文档类型和重要性，与用户交互式确认处理方式。触发场景：\"清理过时文档\"、\"检查文档是否过时\"、\"审计项目文档\"、\"整理文档库\"。",
       "source": "./",
       "strict": false,
       "skills": [
@@ -20,7 +20,7 @@
     },
     {
       "name": "conversation-exporter",
-      "description": "导出 Claude Code 对话历史为 Markdown 格式",
+      "description": "Export Claude Code conversation history to markdown format. Use when you need to: (1) Save important conversations as reference documents, (2) Share conversation history with others, (3) Create documentation from debugging sessions, (4) Archive project-related conversations for future reference.",
       "source": "./",
       "strict": false,
       "skills": [
@@ -29,7 +29,7 @@
     },
     {
       "name": "free-ai-chat-deployment",
-      "description": "免费部署 AI 聊天应用到多云环境（Cloudflare + Azure + 阿里云域名）",
+      "description": "免费部署 AI 聊天应用到多云环境（Cloudflare Pages + Azure Functions + 阿里云域名）。包含前端部署、后端 API 配置、自定义域名设置、SSE 流式传输等完整流程。适用于需要低成本部署 AI 应用的开发者。",
       "source": "./",
       "strict": false,
       "skills": [
@@ -38,7 +38,7 @@
     },
     {
       "name": "debug",
-      "description": "系统化问题解决技能 - 整合 5 Whys 根因分析和第一性原理重建思维，提供三层问题解决模型、双轨调试方法、生产环境验证和工具使用指南",
+      "description": "系统化问题解决技能 - 整合 5 Whys 根因分析、第一性原理重建思维和本地错题集，提供三层问题解决模型、双轨调试方法、生产环境验证、工具使用指南和经验积累。适用于故障排查、性能优化、系统重构和创新突破。",
       "source": "./",
       "strict": false,
       "skills": [
@@ -47,7 +47,7 @@
     },
     {
       "name": "ralph-loop",
-      "description": "基于 Bash 循环的 Ralph Wiggum 技术，让 AI 持续迭代直到完成所有任务。支持 Build 模式（一键启动）和 Plan 模式（交互式配置），跨平台支持（Linux/macOS/Windows），默认集成 debug skills 加速迭代。",
+      "description": "极简 Ralph Loop - 让 AI 持续迭代直到完成任务。仅 3 个组件：TASKS.md（任务清单）、loop 脚本（8 行平台特定循环）、Claude CLI。基于第一性原理重构，移除了所有非必要复杂性。触发场景：\"开始 ralph\"、\"启动 ralph\"、\"ralph loop\"、\"使用 ralph 自动开发\"。",
       "source": "./",
       "strict": false,
       "skills": [
@@ -74,7 +74,7 @@
     },
     {
       "name": "linus-code-review",
-      "description": "Linus Torvalds 视角的代码审查 - 基于5层分析框架评估代码质量：数据结构、特殊情况、复杂度、破坏性、实用性。追求「好品味」(Good Taste)、向后兼容、简洁实用。**默认启用**：代码审查/编写/API设计/技术决策时自动应用Linus思维。智能建议：复杂任务(5+文件/500+行)时自动建议使用ralph-wiggum自动迭代。",
+      "description": "Linus Torvalds 视角的代码审查 - 基于5层分析框架评估代码质量：数据结构、特殊情况、复杂度、破坏性、实用性。追求「好品味」(Good Taste)、向后兼容、简洁实用。**默认启用**：代码审查/编写/API设计/技术决策时自动应用Linus思维。智能建议：复杂任务(5+文件/500+行)时自动建议使用ralph-loop自动迭代。",
       "source": "./",
       "strict": false,
       "skills": [

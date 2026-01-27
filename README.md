@@ -34,7 +34,7 @@ AI 辅助的项目文档审计工具。扫描项目中的 Markdown 文档，收�
 - "配置自定义域名"
 
 ### 4. Debug (general/debug)
-系统化问题解决技能 - 整合 5 Whys 根因分析和第一性原理重建思维，提供三层问题解决模型（问题分类 → 双轨调查 → 四重解决）、双轨调试方法、生产环境验证和工具使用指南。适用于故障排查、性能优化、系统重构和创新突破。
+系统化问题解决技能 - 整合 5 Whys 根因分析、第一性原理重建思维和本地错题集，提供三层问题解决模型（问题分类 → 双轨调查 → 四重解决）、双轨调试方法、生产环境验证、工具使用指南和经验积累。适用于故障排查、性能优化、系统重构和创新突破。
 
 **使用场景**：
 - "使用 debug 技能分析这个问题"
@@ -62,16 +62,22 @@ AI 辅助的项目文档审计工具。扫描项目中的 Markdown 文档，收�
 - "梳理项目思路"
 - "我想做一个..."
 
-### 7. Ralph Wiggum (general/ralph-wiggum)
-搭建用于 Ralph Wiggum 的 bash 文件和相关文件，适合长期自运行自迭代项目。支持 Build 模式（一键启动）和 Plan 模式（交互式配置），跨平台支持（Linux/macOS/Windows），默认集成 debug skills 加速迭代。现已集成 first-principles-planner，可自动生成实施计划。
+### 7. Ralph Loop (general/ralph-loop)
+极简 Ralph Loop - 让 AI 持续迭代直到完成任务。仅 3 个组件：TASKS.md（任务清单）、loop 脚本（8 行平台特定循环）、Claude CLI。基于第一性原理重构，移除了所有非必要复杂性。适合长期自运行自迭代项目，跨平台支持（Linux/macOS/Windows）。
 
 **使用场景**：
-- "开始 ralph 循环"
+- "开始 ralph"
 - "启动 ralph"
-- "ralph wiggum"
+- "ralph loop"
 - "使用 ralph 自动开发"
 - "长期项目"
-- "启动loop"
+
+### 8. Linus Code Review (general/linus-code-review)
+Linus Torvalds 视角的代码审查 - 基于第一性原理分析代码质量，评估"好品味"(Good Taste)、检查破坏性变更、追求简洁实用。包含5层分析框架：数据结构、边界情况、复杂度、破坏性、实用性。
+
+**特点**：
+- **默认启用**：代码审查、代码编写、API设计、技术决策时自动应用 Linus 思维
+- **智能建议**：复杂任务（5+文件/500+行）时自动建议使用 ralph-loop 自动迭代
 
 ## 安装方法
 
@@ -98,7 +104,8 @@ claude plugin install free-ai-chat-deployment@liuxiaoyusky
 claude plugin install debug@liuxiaoyusky
 claude plugin install first-principles@liuxiaoyusky
 claude plugin install first-principles-planner@liuxiaoyusky
-claude plugin install ralph-wiggum@liuxiaoyusky
+claude plugin install ralph-loop@liuxiaoyusky
+claude plugin install linus-code-review@liuxiaoyusky
 ```
 
 ## 更新技能
@@ -108,7 +115,7 @@ claude plugin install ralph-wiggum@liuxiaoyusky
 **通过 CLI 更新：**
 ```bash
 # 更新特定技能
-claude plugin update ralph-wiggum@liuxiaoyusky
+claude plugin update ralph-loop@liuxiaoyusky
 
 # 更新所有来自此 marketplace 的技能
 claude plugin marketplace update ai-developer-skills
@@ -151,7 +158,9 @@ claude plugin marketplace update ai-developer-skills
 
 "使用 first-principles-planner 技能规划我的新项目"
 
-"使用 ralph-wiggum 技能自动开发项目"
+"使用 ralph-loop 技能自动开发项目"
+
+"使用 linus-code-review 技能审查这段代码"
 ```
 
 ## 技能开发

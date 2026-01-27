@@ -1,6 +1,6 @@
 ---
 name: linus-code-review
-description: Linus Torvalds 视角的代码审查 - 基于第一性原理分析代码质量，评估"好品味"(Good Taste)、检查破坏性变更、追求简洁实用。包含5层分析框架：数据结构、边界情况、复杂度、破坏性、实用性。**默认启用**：代码审查、代码编写、API设计、技术决策时自动应用Linus思维。智能建议：复杂任务(5+文件/500+行)时自动建议使用ralph-wiggum自动迭代。
+description: Linus Torvalds 视角的代码审查 - 基于第一性原理分析代码质量，评估"好品味"(Good Taste)、检查破坏性变更、追求简洁实用。包含5层分析框架：数据结构、边界情况、复杂度、破坏性、实用性。**默认启用**：代码审查、代码编写、API设计、技术决策时自动应用Linus思维。智能建议：复杂任务(5+文件/500+行)时自动建议使用ralph-loop自动迭代。
 ---
 
 # Linus Code Review Skill
@@ -278,15 +278,15 @@ Add a deprecation warning. **THINK ABOUT USERS.**"
 
 ---
 
-## 复杂任务自动化 - Ralph Wiggum
+## 复杂任务自动化 - Ralph Loop
 
 **改动太大？用 Ralph。就这么简单。**
 
-当任务规模大（5+文件、500+行、系统性重构、API破坏性变更）时，建议启动 `/ralph-wiggum` 自动迭代。
+当任务规模大（5+文件、500+行、系统性重构、API破坏性变更）时，建议启动 ralph-loop 自动迭代。
 
 **建议模板**:
 ```markdown
-## 🚀 Linus 建议：启动 Ralph Wiggum Loop
+## 🚀 Linus 建议：启动 Ralph Loop
 
 **为什么？**
 - 需要重构 [X] 个文件
@@ -295,7 +295,7 @@ Add a deprecation warning. **THINK ABOUT USERS.**"
 
 **如何启动？**
 1. 创建 TASKS.md 列出所有待办事项
-2. 运行：`/ralph-wiggum` 或 "开始 ralph"
+2. 运行：loop.sh 或 "开始 ralph"
 3. Ralph 会持续迭代，直到所有任务完成
 ```
 
