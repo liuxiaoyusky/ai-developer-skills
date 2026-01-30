@@ -1,6 +1,13 @@
 #!/bin/bash
 # Ralph Loop + Dev Flow 自动迭代脚本
 #
+# ⚠️  安全提示：
+#   此脚本使用 --dangerously-skip-permissions 参数运行，将跳过所有权限确认。
+#   在运行前，请务必：
+#   1. 仔细审查 tasks.md 中的所有任务
+#   2. 确认任务范围在可接受的风险内
+#   3. 如有疑问，先手动执行 dev-flow 测试
+#
 # 使用方法：
 #   1. 确保 tasks.md 存在并包含任务
 #   2. 确保 dev-flow 技能已安装
@@ -61,7 +68,7 @@ while cat tasks.md | grep -q "^\- \[ \]"; do
 
     # 调用 Claude CLI 执行 dev-flow
     # 每次调用 = 1 次 dev-flow 执行（5 步闭环）
-    claude "使用 dev-flow 技能处理下一个任务"
+    claude --dangerously-skip-permissions "使用 dev-flow 技能处理下一个任务"
 
     # 记录结束时间
     END_TIME=$(date +%s)
