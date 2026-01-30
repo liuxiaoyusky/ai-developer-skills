@@ -47,7 +47,7 @@
     },
     {
       "name": "ralph-loop",
-      "description": "自动迭代调度器 - 循环调用 dev-flow 完成所有任务。每次迭代 = 1 次 dev-flow 执行（5 步闭环）。仅 2 个组件：tasks.md（任务清单）、loop 脚本（5 行循环）。新架构：Ralph Loop 负责调度（何时执行），Dev Flow 负责执行（如何实现）。触发场景：\"开始 ralph\"、\"启动 ralph\"、\"ralph loop\"。",
+      "description": "自动迭代调度器 - 循环调用 dev-flow 完成所有任务。每次迭代 = 1 次 dev-flow 执行（5 步闭环）。仅 2 个组件：tasks.md（任务清单）、loop 脚本（5 行循环）。触发场景：\"开始 ralph\"、\"启动 ralph\"、\"ralph loop\"。",
       "source": "./",
       "strict": false,
       "skills": [
@@ -74,7 +74,7 @@
     },
     {
       "name": "linus-code-review",
-      "description": "Linus Torvalds 视角的代码审查 - 基于5层分析框架评估代码质量：数据结构、特殊情况、复杂度、破坏性、实用性。追求「好品味」(Good Taste)、向后兼容、简洁实用。**默认启用**：代码审查/编写/API设计/技术决策时自动应用Linus思维。智能建议：复杂任务(5+文件/500+行)时自动建议使用ralph-loop→dev-flow自动迭代。",
+      "description": "Linus Torvalds 视角的代码审查 - 基于5层分析框架评估代码质量：数据结构、特殊情况、复杂度、破坏性、实用性。追求「好品味」(Good Taste)、向后兼容、简洁实用。**默认启用**：代码审查/编写/API设计/技术决策时自动应用Linus思维。智能建议：复杂任务(5+文件/500+行)时自动建议使用 ralph-loop + dev-flow 自动迭代。",
       "source": "./",
       "strict": false,
       "skills": [
