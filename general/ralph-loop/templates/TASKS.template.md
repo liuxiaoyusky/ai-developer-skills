@@ -1,25 +1,11 @@
-# Project: [Brief description]
+# 开发任务清单
 
-## Tasks
+## 待处理 (TODO)
 
-- [ ] Task 1: [Description] - Acceptance: [criteria]
-- [ ] Task 2: [Description] - Acceptance: [criteria]
-- [ ] Task 3: [Description] - Acceptance: [criteria]
+- [ ] 任务1：描述你的任务
+- [ ] 任务2：描述你的任务
 
-**Format**: `- [ ]` incomplete, `- [x]` complete. Loop stops when all are `[x]`.
+## 已完成 (DONE)
 
----
-
-## Validation
-
-```bash
-# Tests: npm test | cargo test | pytest
-# Typecheck: npm run typecheck | cargo clippy | mypy .
-# Lint: npm run lint | eslint | flake8
-```
-
-These are required backpressure - AI must run and fix any failures.
-
----
-
-**Keep it minimal** - This file is loaded every iteration. Remove completed tasks periodically.
+# 完成后的示例：
+# - [x] 初始化项目结构

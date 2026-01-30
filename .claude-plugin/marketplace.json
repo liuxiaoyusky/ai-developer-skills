@@ -5,8 +5,8 @@
     "email": "noreply@github.com"
   },
   "metadata": {
-    "description": "AI 辅助开发技能集合 - 包含文档审计、对话导出、免费 AI 聊天部署等实用技能",
-    "version": "1.0.0"
+    "description": "AI 辅助开发技能集合 - 包含开发流程、任务管理、代码审查、调试、第一性原理等实用技能",
+    "version": "2.0.0"
   },
   "plugins": [
     {
@@ -47,7 +47,7 @@
     },
     {
       "name": "ralph-loop",
-      "description": "极简 Ralph Loop - 让 AI 持续迭代直到完成任务。仅 3 个组件：TASKS.md（任务清单）、loop 脚本（8 行平台特定循环）、Claude CLI。基于第一性原理重构，移除了所有非必要复杂性。触发场景：\"开始 ralph\"、\"启动 ralph\"、\"ralph loop\"、\"使用 ralph 自动开发\"。",
+      "description": "自动迭代调度器 - 循环调用 dev-flow 完成所有任务。每次迭代 = 1 次 dev-flow 执行（5 步闭环）。仅 2 个组件：tasks.md（任务清单）、loop 脚本（5 行循环）。新架构：Ralph Loop 负责调度（何时执行），Dev Flow 负责执行（如何实现）。触发场景：\"开始 ralph\"、\"启动 ralph\"、\"ralph loop\"。",
       "source": "./",
       "strict": false,
       "skills": [
@@ -74,11 +74,20 @@
     },
     {
       "name": "linus-code-review",
-      "description": "Linus Torvalds 视角的代码审查 - 基于5层分析框架评估代码质量：数据结构、特殊情况、复杂度、破坏性、实用性。追求「好品味」(Good Taste)、向后兼容、简洁实用。**默认启用**：代码审查/编写/API设计/技术决策时自动应用Linus思维。智能建议：复杂任务(5+文件/500+行)时自动建议使用ralph-loop自动迭代。",
+      "description": "Linus Torvalds 视角的代码审查 - 基于5层分析框架评估代码质量：数据结构、特殊情况、复杂度、破坏性、实用性。追求「好品味」(Good Taste)、向后兼容、简洁实用。**默认启用**：代码审查/编写/API设计/技术决策时自动应用Linus思维。智能建议：复杂任务(5+文件/500+行)时自动建议使用ralph-loop→dev-flow自动迭代。",
       "source": "./",
       "strict": false,
       "skills": [
         "./general/linus-code-review"
+      ]
+    },
+    {
+      "name": "dev-flow",
+      "description": "持久开发流程 - 管理开发任务的完整生命周期，包括任务识别、拆解、执行、测试和调试。**自动激活**：所有开发相关任务。提供系统化的任务追踪，与 first-principles 和 debug 技能深度集成。",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./general/dev-flow"
       ]
     }
   ]

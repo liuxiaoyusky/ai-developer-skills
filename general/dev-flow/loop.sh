@@ -1,25 +1,33 @@
 #!/bin/bash
-# Ralph Loop - macOS/Linux 示例脚本
+# Ralph Loop + Dev Flow 自动迭代脚本
+#
 # 使用方法：
-# 1. 复制到你的项目目录: cp loop.sample.sh loop.sh
-# 2. 确保 tasks.md 文件存在
-# 3. 运行: chmod +x loop.sh && ./loop.sh
+#   1. 确保 tasks.md 存在并包含任务
+#   2. 确保 dev-flow 技能已安装
+#   3. 运行：bash loop.sh
+#
+# 架构说明：
+#   每次 CLI 调用 = 1 次 dev-flow 执行（5 步闭环）
+#   - 任务识别 → 拆解 → 执行 → 测试 → 调试
+#   - 成功：任务移到 DONE
+#   - 失败：保持在 TODO，下次继续
 
 set -e  # 遇到错误退出
 
 # 颜色输出
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
+RED='\033[0;31m'
 NC='\033[0m' # No Color
 
 echo -e "${GREEN}╔════════════════════════════════════════════════════════╗${NC}"
-echo -e "${GREEN}║     Ralph Loop - 自动迭代调度器                          ║${NC}"
+echo -e "${GREEN}║     Ralph Loop + Dev Flow 自动迭代系统                  ║${NC}"
 echo -e "${GREEN}╚════════════════════════════════════════════════════════╝${NC}"
 echo ""
 
 # 检查 tasks.md 是否存在
 if [ ! -f "tasks.md" ]; then
-    echo -e "${YELLOW}错误：tasks.md 不存在${NC}"
+    echo -e "${RED}错误：tasks.md 不存在${NC}"
     echo "请先创建 tasks.md 并添加任务"
     exit 1
 fi
