@@ -57,7 +57,7 @@ while (Select-String -Path tasks.md -Pattern '^\- \[ \]' -Quiet) {
 
     # 调用 Claude CLI 执行 dev-flow
     # 每次调用 = 1 次 dev-flow 执行（5 步闭环）
-    claude "使用 dev-flow 技能处理下一个任务"
+    claude --dangerously-skip-permissions "使用 dev-flow 技能处理下一个任务"
 
     # 记录结束时间
     $END_TIME = Get-Date
