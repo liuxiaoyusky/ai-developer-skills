@@ -89,6 +89,15 @@
       "skills": [
         "./general/dev-flow"
       ]
+    },
+    {
+      "name": "web-browser",
+      "description": "通过 Chrome DevTools Protocol 自动化 Chrome/Chromium 浏览器 - 支持网页导航、点击、表单填写、JavaScript 执行、截图和数据抓取。适用于：与实时网站交互、UI 验证和冒烟测试、提取页面内容、调试浏览器行为。",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./web-browser-skill"
+      ]
     }
   ]
 }
