@@ -121,7 +121,7 @@ Linus Code Review (最终审查)
    - ✅ 强调自动触发场景
 
 3. **.claude-plugin/marketplace.json**
-   - ✅ 更新 linus-code-review description
+   - ✅ 更新 dev-review description
    - ✅ 反映"默认启用"和"智能建议"特性
 
 #### 新增的文件
@@ -188,7 +188,7 @@ AI:
 **AI 理解**：
 - 当用户说"审查代码"、"设计 API"、"如何实现"时
 - AI 自动应用 Linus 的 5 层分析框架
-- 无需显式调用 `/linus-code-review`
+- 无需显式调用 `/dev-review`
 
 #### Ralph Wiggum 智能建议
 

@@ -1,0 +1,3 @@
+[submodule "masters_skills/skills"]
+	path = masters_skills/skills
+	url = https://github.com/GBSOSS/skill-from-masters.git

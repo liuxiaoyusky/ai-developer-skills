@@ -722,23 +722,23 @@ Step 5: 调用 debug 技能
 修复完成，返回 Step 4 重新测试
 ```
 
-### Dev Flow + Ralph Loop
+### Dev Flow + dev-loop
 
 **第一性原理设计**：每次完整的 Dev Flow 执行 = 一个迭代
 
 ```
 传统方式（已弃用）：
-ralph-loop 调用自己 → 实现细节
+dev-loop 调用自己 → 实现细节
 
 第一性原理方式（推荐）：
-ralph-loop 调用 dev-flow → 标准化流程
+dev-loop 调用 dev-flow → 标准化流程
 ```
 
 **架构对比**：
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│  传统 Ralph Loop（直接实现）                                  │
+│  传统 dev-loop（直接实现）                                  │
 ├─────────────────────────────────────────────────────────────┤
 │  loop.sh:                                                   │
 │    while cat TASKS.md | grep -q "^\- \[ \]"; do             │
@@ -752,7 +752,7 @@ ralph-loop 调用 dev-flow → 标准化流程
 └─────────────────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────────────────┐
-│  新方式：Ralph Loop → Dev Flow（推荐）                        │
+│  新方式：dev-loop → Dev Flow（推荐）                        │
 ├─────────────────────────────────────────────────────────────┤
 │  loop.sh:                                                   │
 │    while cat tasks.md | grep -q "^\- \[ \]"; do             │
@@ -807,7 +807,7 @@ CLI 退出，loop.sh 继续下一次迭代
 
 **可行性验证**：✅ **可信**
 
-| 维度 | 传统 Ralph Loop | Ralph Loop + Dev Flow |
+| 维度 | 传统 dev-loop | dev-loop + Dev Flow |
 |------|-----------------|----------------------|
 | 流程标准化 | ❌ 随意性强 | ✅ 5 步固定流程 |
 | 可调试性 | ❌ 难以追踪 | ✅ dev-flow.log |
@@ -823,10 +823,10 @@ CLI 退出，loop.sh 继续下一次迭代
 | 简单开发任务 | dev-flow | - |
 | 复杂任务拆解 | dev-flow | first-principles |
 | 任务调试 | dev-flow | debug |
-| 长期项目 | **ralph-loop → dev-flow** | debug, first-principles |
-| 代码审查 | linus-code-review | - |
+| 长期项目 | **dev-loop → dev-flow** | debug, first-principles |
+| 代码审查 | dev-review | - |
 
-**关键变化**：ralph-loop 不再直接实现任务，而是调用 dev-flow 执行标准化流程。
+**关键变化**：dev-loop 不再直接实现任务，而是调用 dev-flow 执行标准化流程。
 
 ---
 
@@ -1000,7 +1000,7 @@ task-details-test.md → my-tests.md
 
 - `first-principles` - 任务拆解时调用
 - `debug` - 测试失败时调用
-- `ralph-loop` - 长期项目时建议使用
+- `dev-loop` - 长期项目时建议使用
 
 ---
 

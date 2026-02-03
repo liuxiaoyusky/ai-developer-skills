@@ -37,21 +37,21 @@
       ]
     },
     {
-      "name": "debug",
+      "name": "dev-debug",
       "description": "系统化问题解决技能 - 整合 5 Whys 根因分析、第一性原理重建思维和本地错题集，提供三层问题解决模型、双轨调试方法、生产环境验证、工具使用指南和经验积累。适用于故障排查、性能优化、系统重构和创新突破。",
       "source": "./",
       "strict": false,
       "skills": [
-        "./general/debug"
+        "./general/dev-debug"
       ]
     },
     {
-      "name": "ralph-loop",
-      "description": "自动迭代调度器 - 循环调用 dev-flow 完成所有任务。每次迭代 = 1 次 dev-flow 执行（5 步闭环）。仅 2 个组件：tasks.md（任务清单）、loop 脚本（5 行循环）。触发场景：\"开始 ralph\"、\"启动 ralph\"、\"ralph loop\"。",
+      "name": "dev-loop",
+      "description": "自动迭代调度器 - 循环调用 dev-flow 完成所有任务。每次迭代 = 1 次 dev-flow 执行（5 步闭环）。仅 2 个组件：tasks.md（任务清单）、loop 脚本（5 行循环）。触发场景：\"开始迭代\"、\"启动 loop\"、\"dev loop\"。",
       "source": "./",
       "strict": false,
       "skills": [
-        "./general/ralph-loop"
+        "./general/dev-loop"
       ]
     },
     {
@@ -73,17 +73,17 @@
       ]
     },
     {
-      "name": "linus-code-review",
-      "description": "Linus Torvalds 视角的代码审查 - 基于5层分析框架评估代码质量：数据结构、特殊情况、复杂度、破坏性、实用性。追求「好品味」(Good Taste)、向后兼容、简洁实用。**默认启用**：代码审查/编写/API设计/技术决策时自动应用Linus思维。智能建议：复杂任务(5+文件/500+行)时自动建议使用 ralph-loop + dev-flow 自动迭代。",
+      "name": "dev-review",
+      "description": "Linus Torvalds 视角的代码审查 - 基于5层分析框架评估代码质量：数据结构、特殊情况、复杂度、破坏性、实用性。追求「好品味」(Good Taste)、向后兼容、简洁实用。**默认启用**：代码审查/编写/API设计/技术决策时自动应用Linus思维。智能建议：复杂任务(5+文件/500+行)时自动建议使用 dev-loop + dev-flow 自动迭代。",
       "source": "./",
       "strict": false,
       "skills": [
-        "./general/linus-code-review"
+        "./general/dev-review"
       ]
     },
     {
       "name": "dev-flow",
-      "description": "持久开发流程 - 管理开发任务的完整生命周期，包括任务识别、拆解、执行、测试和调试。**自动激活**：所有开发相关任务。提供系统化的任务追踪，与 first-principles 和 debug 技能深度集成。",
+      "description": "持久开发流程 - 管理开发任务的完整生命周期，包括任务识别、拆解、执行、测试和调试。**自动激活**：所有开发相关任务。提供系统化的任务追踪，与 first-principles 和 dev-debug 技能深度集成。",
       "source": "./",
       "strict": false,
       "skills": [
@@ -97,6 +97,15 @@
       "strict": false,
       "skills": [
         "./web-browser-skill"
+      ]
+    },
+    {
+      "name": "business-routing",
+      "description": "商务场景技能集合 - 包含职场邮件撰写、会议纪要、报告生成等日常工作场景的 AI 辅助技能。一安装即可获得全套商务沟通工具。",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./business_routing/business-email"
       ]
     }
   ]

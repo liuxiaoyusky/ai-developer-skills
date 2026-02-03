@@ -68,7 +68,7 @@
 ### 触发方式
 
 ```bash
-/linus-code-review
+/dev-review
 "审查这段代码"
 "Linus code review this"
 "从 Linus 的视角看这段代码"
@@ -190,7 +190,7 @@
 
 ## 适用场景
 
-### ✅ 使用 linus-code-review
+### ✅ 使用 dev-review
 
 - **代码审查** - Pull Request review, 代码走查
 - **重构前评估** - 评估代码质量，决定是否重构
@@ -226,7 +226,7 @@
 ## 安装
 
 ```bash
-claude plugin install linus-code-review
+claude plugin install dev-review
 ```
 
 ---

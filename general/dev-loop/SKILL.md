@@ -1,9 +1,9 @@
 ---
-name: ralph-loop
-description: 自动迭代调度器 - 循环调用 dev-flow 完成所有任务。每次迭代 = 1 次 dev-flow 执行（5 步闭环）。仅 2 个组件：tasks.md（任务清单）、loop 脚本（5 行循环）。触发场景："开始 ralph"、"启动 ralph"、"ralph loop"。
+name: dev-loop
+description: 自动迭代调度器 - 循环调用 dev-flow 完成所有任务。每次迭代 = 1 次 dev-flow 执行（5 步闭环）。仅 2 个组件：tasks.md（任务清单）、loop 脚本（5 行循环）。触发场景："开始迭代"、"启动迭代"、"dev-loop"。
 ---
 
-# Ralph Loop Skill
+# dev-loop Skill
 
 > **极简自动迭代调度器** - 让 AI 持续迭代直到完成所有任务
 
@@ -19,7 +19,7 @@ description: 自动迭代调度器 - 循环调用 dev-flow 完成所有任务。
 
 **新架构**（推荐）：
 ```
-Ralph Loop（调度器）
+dev-loop（调度器）
   ↓
 Dev Flow（标准化执行）
   ↓
@@ -28,7 +28,7 @@ Dev Flow（标准化执行）
 
 **旧架构**（已弃用）：
 ```
-Ralph Loop（直接实现）
+dev-loop（直接实现）
   ↓
 非标准化执行
   ↓
@@ -41,51 +41,37 @@ Ralph Loop（直接实现）
 
 ### 激活时的行为
 
-**当用户说"开始 ralph"、"启动 ralph"、"ralph loop"时**：
+**当用户说"开始迭代"、"启动迭代"、"dev-loop"时**：
 
-1. **检查是否存在 tasks.md 和 loop.sh**
+1. **检查是否存在 tasks.md 和 loop.js**
 2. **如果都不存在** → 创建这两个文件（从模板或默认内容）
 3. **创建完成后立即停止** → 不要运行、不要检查、不要询问
-4. **让用户自己决定何时运行** `./loop.sh`
+4. **让用户自己决定何时运行** `node loop.js`
 
 **重要**：
 - ✅ 生成文件后立即停止
-- ❌ 不要自动运行 loop.sh
+- ❌ 不要自动运行 loop.js
 - ❌ 不要检查文件内容
 - ❌ 不要询问"是否要开始"
 
 ### 方式 1：使用模板文件（推荐）
 
-**macOS/Linux**:
 ```bash
 # 1. 复制模板文件
-cp templates/tasks.template.md tasks.md
-cp templates/loop.sample.sh loop.sh
+cp templates/TASKS.template.md tasks.md
+cp templates/loop.sample.js loop.js
 
 # 2. 编辑任务
 vim tasks.md  # 添加你的任务
 
-# 3. 运行
-chmod +x loop.sh
-./loop.sh
-```
-
-**Windows**:
-```powershell
-# 1. 复制模板文件
-copy templates\tasks.template.md tasks.md
-copy templates\loop.sample.ps1 loop.ps1
-
-# 2. 编辑任务
-notepad tasks.md  # 添加你的任务
-
-# 3. 运行
-.\loop.ps1
+# 3. 运行（跨平台）
+node loop.js
+# 或添加执行权限后直接运行
+chmod +x loop.js && ./loop.js
 ```
 
 ### 方式 2：直接使用（5 行核心代码）
 
-**macOS/Linux**:
 ```bash
 # 1. 创建任务文件
 cat > tasks.md << 'EOF'
@@ -99,28 +85,9 @@ cat > tasks.md << 'EOF'
 EOF
 
 # 2. 运行
-while cat tasks.md | grep -q "^\- \[ \]"; do
+while grep -q "^\- \[ \]" tasks.md; do
   claude "使用 dev-flow 技能处理下一个任务"
 done
-```
-
-**Windows**:
-```powershell
-# 1. 创建任务文件
-@"
-# 开发任务清单
-
-## 待处理 (TODO)
-- [ ] 实现用户登录功能
-- [ ] 添加数据导出功能
-
-## 已完成 (DONE)
-"@ | Out-File -Encoding UTF8 tasks.md
-
-# 2. 运行
-while (Select-String -Path tasks.md -Pattern '^\- \[ \]' -Quiet) {
-    claude "使用 dev-flow 技能处理下一个任务"
-}
 ```
 
 ---
@@ -130,13 +97,12 @@ while (Select-String -Path tasks.md -Pattern '^\- \[ \]' -Quiet) {
 ### 文件结构
 
 ```
-ralph-loop/
+dev-loop/
 ├── SKILL.md              # 技能定义（本文档）
 ├── README.md             # 用户文档
 ├── templates/            # 模板文件
-│   ├── tasks.template.md      # 任务清单模板
-│   ├── loop.sample.sh         # macOS/Linux 循环脚本（带进度显示）
-│   └── loop.sample.ps1        # Windows 循环脚本（带进度显示）
+│   ├── TASKS.template.md      # 任务清单模板
+│   └── loop.sample.js         # 跨平台循环脚本（带进度显示）
 └── LICENSE               # MIT License
 ```
 
@@ -144,11 +110,11 @@ ralph-loop/
 
 使用模板创建：
 ```bash
-cp templates/tasks.template.md tasks.md
+cp templates/TASKS.template.md tasks.md
 ```
 
 **格式**：
-
+```markdown
 ## 待处理 (TODO)
 - [ ] 任务1：描述
 - [ ] 任务2：描述
@@ -162,56 +128,32 @@ cp templates/tasks.template.md tasks.md
 - `- [x]` 已完成
 - 全部 `- [x]` 时循环自动停止
 
-### loop.sh（macOS/Linux）
+### loop.js（跨平台脚本）
 
 **5 行核心版本**：
-```bash
-#!/bin/bash
-while cat tasks.md | grep -q "^\- \[ \]"; do
-  claude "使用 dev-flow 技能处理下一个任务"
-done
-echo "✅ 所有任务完成！"
+```javascript
+const { execSync } = require('child_process');
+const fs = require('fs');
+
+while (fs.readFileSync('tasks.md', 'utf-8').includes('- [ ]')) {
+  execSync('claude "使用 dev-flow 技能处理下一个任务"', { stdio: 'inherit' });
+}
+console.log('✅ 所有任务完成！');
 ```
 
 **增强版（带进度显示）**：使用模板
 ```bash
-cp templates/loop.sample.sh loop.sh
-chmod +x loop.sh
-./loop.sh
+cp templates/loop.sample.js loop.js
+node loop.js
 ```
 
 增强版特性：
 - ✅ 迭代计数器
 - ✅ 进度统计（待处理/已完成）
 - ✅ 耗时显示
-- ✅ 彩色输出
+- ✅ 彩色输出（跨平台 ANSI）
 - ✅ 错误处理
-
-### loop.ps1（Windows）
-
-**5 行核心版本**：
-```powershell
-while (Select-String -Path tasks.md -Pattern '^\- \[ \]' -Quiet) {
-    claude "使用 dev-flow 技能处理下一个任务"
-}
-Write-Host "✅ 所有任务完成！"
-```
-
-**增强版（带进度显示）**：使用模板
-```powershell
-copy templates\loop.sample.ps1 loop.ps1
-.\loop.ps1
-```
-
-增强版特性：
-- ✅ 迭代计数器
-- ✅ 进度统计（待处理/已完成）
-- ✅ 耗时显示
-- ✅ 彩色输出
-- ✅ 错误处理
-}
-Write-Host "✅ 所有任务完成！"
-```
+- ✅ Windows/macOS/Linux 通用
 
 ---
 
@@ -220,7 +162,7 @@ Write-Host "✅ 所有任务完成！"
 ### 传统方式（已弃用）
 
 ```
-❌ Ralph Loop 直接实现
+❌ dev-loop 直接实现
    - 每次执行逻辑不一致
    - 没有标准化流程
    - 难以追踪和调试
@@ -230,7 +172,7 @@ Write-Host "✅ 所有任务完成！"
 ### 新方式（推荐）
 
 ```
-✅ Ralph Loop → Dev Flow
+✅ dev-loop → Dev Flow
    - 每次执行都是标准化流程（5 步）
    - 自动日志记录（dev-flow.log）
    - 集成 first-principles + debug
@@ -251,7 +193,7 @@ Write-Host "✅ 所有任务完成！"
   - 成功：更新 tasks.md，任务移到 DONE
   - 失败：保持在 TODO，下次继续
   ↓
-CLI 退出，loop.sh 继续下一次迭代
+CLI 退出，loop.js 继续下一次迭代
 ```
 
 ---
@@ -263,7 +205,7 @@ CLI 退出，loop.sh 继续下一次迭代
 ```bash
 #!/bin/bash
 iteration=0
-while cat tasks.md | grep -q "^\- \[ \]"; do
+while grep -q "^\- \[ \]" tasks.md; do
   iteration=$((iteration + 1))
   echo "=== 迭代 #$iteration ==="
   claude "使用 dev-flow 技能处理下一个任务"
@@ -276,16 +218,22 @@ echo "✅ 完成！共 $iteration 次迭代"
 ```bash
 #!/bin/bash
 iteration=0
-while cat tasks.md | grep -q "^\- \[ \]"; do
+while grep -q "^\- \[ \]" tasks.md; do
   iteration=$((iteration + 1))
   claude "使用 dev-flow 技能处理下一个任务"
   git add -A && git commit -m "iteration $iteration"
 done
 ```
 
-### 完整版 loop.sh（带日志）
+### 完整版 loop.js（带进度显示）
 
-见 [dev-flow/skill](../dev-flow/SKILL.md) 中的 `loop.sh` 示例。
+使用模板获取：
+```bash
+cp templates/loop.sample.js loop.js
+node loop.js
+```
+
+完整版包含所有增强功能：迭代计数、进度统计、耗时显示、彩色输出、错误处理。
 
 ---
 
@@ -294,8 +242,8 @@ done
 | 场景 | 使用方法 |
 |------|----------|
 | 单次任务 | `claude "使用 dev-flow 技能"` |
-| 长期项目 | `bash loop.sh` |
-| 自动迭代 | Ralph Loop + Dev Flow |
+| 长期项目 | `node loop.js` |
+| 自动迭代 | dev-loop + Dev Flow |
 
 ---
 
@@ -344,7 +292,7 @@ A: 任务保持在 TODO，下次继续；debug 技能会记录错题集
 
 ### 对比
 
-| 指标 | 旧版 Ralph Loop | 新版（Ralph → Dev Flow） |
+| 指标 | 旧版 dev-loop | 新版（Ralph → Dev Flow） |
 |------|-----------------|--------------------------|
 | 核心代码 | 66 行 | 5 行 |
 | 标准化 | ❌ | ✅ 5 步固定 |
@@ -358,7 +306,7 @@ A: 任务保持在 TODO，下次继续；debug 技能会记录错题集
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│  Ralph Loop（调度器）                                     │
+│  dev-loop（调度器）                                     │
 │  - 职责：循环调用 CLI                                      │
 │  - 不关心：如何实现任务                                    │
 └─────────────────────────────────────────────────────────┘
@@ -372,7 +320,7 @@ A: 任务保持在 TODO，下次继续；debug 技能会记录错题集
 ```
 
 **职责分离**：
-- Ralph Loop: **何时**执行（循环）
+- dev-loop: **何时**执行（循环）
 - Dev Flow: **如何**执行（流程）
 
 ---

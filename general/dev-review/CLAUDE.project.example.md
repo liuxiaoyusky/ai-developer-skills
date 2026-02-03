@@ -198,7 +198,7 @@
 
 ```bash
 # 复制到项目根目录
-cp path/to/linus-code-review/CLAUDE.project.example.md ./CLAUDE.md
+cp path/to/dev-review/CLAUDE.project.example.md ./CLAUDE.md
 
 # 可选：自定义项目特定配置
 vim CLAUDE.md

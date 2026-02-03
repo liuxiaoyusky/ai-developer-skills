@@ -1,9 +1,9 @@
 ---
-name: debug
+name: dev-debug
 description: 系统化问题解决技能 - 整合 5 Whys 根因分析、第一性原理重建思维和本地错题集，提供三层问题解决模型、双轨调试方法、生产环境验证、工具使用指南和经验积累。适用于故障排查、性能优化、系统重构和创新突破。
 ---
 
-# Debug Skill
+# Dev-Debug Skill
 
 > **CRITICAL**: 在提出任何解决方案之前，必须通过此框架进行问题分析和路径选择。
 >
@@ -157,7 +157,7 @@ SOLUTION: 添加 finally 块
 
 **语义信号检测**：
 
-当检测到以下信号时，**自动激活 debug skill + 查询错题集**：
+当检测到以下信号时，**自动激活 dev-debug skill + 查询错题集**：
 
 #### 🔴 强信号（立即激活，不询问）
 
@@ -191,7 +191,7 @@ SOLUTION: 添加 finally 块
    "间歇性出现错误"
    ```
 
-**AI 行为**：询问"看起来是性能/行为问题，是否启动 debug skill？[Y/n]"
+**AI 行为**：询问"看起来是性能/行为问题，是否启动 dev-debug skill？[Y/n]"
 
 #### 🟢 弱信号（不激活）
 
@@ -1020,7 +1020,7 @@ dd if=/dev/zero of=test.dat bs=1M count=100
    │  → 自动激活 debug + 查询错题集
    │
    ├─ 🟡 中等信号（性能问题）
-   │  → 询问"是否启动 debug skill？"
+   │  → 询问"是否启动 dev-debug skill？"
    │
    └─ 🟢 弱信号（开发任务）
       → 正常回答，不激活
@@ -1188,4 +1188,4 @@ Debug 技能发现问题分类后：
 
 ---
 
-**End of Debug Skill**
+**End of Dev-Debug Skill**

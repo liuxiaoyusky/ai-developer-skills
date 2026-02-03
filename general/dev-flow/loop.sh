@@ -1,5 +1,5 @@
 #!/bin/bash
-# Ralph Loop + Dev Flow 自动迭代脚本
+# dev-loop + Dev Flow 自动迭代脚本
 #
 # ⚠️  安全提示：
 #   此脚本使用 --dangerously-skip-permissions 参数运行，将跳过所有权限确认。
@@ -28,7 +28,7 @@ RED='\033[0;31m'
 NC='\033[0m' # No Color
 
 echo -e "${GREEN}╔════════════════════════════════════════════════════════╗${NC}"
-echo -e "${GREEN}║     Ralph Loop + Dev Flow 自动迭代系统                  ║${NC}"
+echo -e "${GREEN}║     dev-loop + Dev Flow 自动迭代系统                  ║${NC}"
 echo -e "${GREEN}╚════════════════════════════════════════════════════════╝${NC}"
 echo ""
 
