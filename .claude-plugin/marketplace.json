@@ -107,6 +107,18 @@
       "skills": [
         "./business_routing/business-email"
       ]
+    },
+    {
+      "name": "masters-skills",
+      "description": "大师技能集合 - 来自 GBSOSS/skill-from-masters，基于业界大师的方法论创建 AI 技能。「站在巨人的肩膀上」— 在生成技能前先融合领域专家的最佳实践。包含主技能(skill-from-masters)和辅助搜索技能(search-skill、skill-from-github、skill-from-notebook)。使用 Git Submodule 管理，与原仓库同步更新。",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./masters_skills/skills/skill-from-masters",
+        "./masters_skills/skills/skills/search-skill",
+        "./masters_skills/skills/skills/skill-from-github",
+        "./masters_skills/skills/skills/skill-from-notebook"
+      ]
     }
   ]
 }
