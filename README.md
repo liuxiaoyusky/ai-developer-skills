@@ -94,6 +94,28 @@ Linus Torvalds 视角的代码审查 - 基于第一性原理分析代码质量�
 - "使用 dev-flow 技能"
 - "开始开发流程"
 
+### 10. Skill Checker (general/skill-checker)
+Claude Skills 管理工具 - 检查并列出本地 skills 和 marketplace 插件，检测插件更新并提示升级。提供完整的技能生态管理能力。
+
+**特点**：
+- **本地Skills扫描** - 区分官方/自定义技能，检测断开的软链接
+- **Marketplace插件检查** - 读取已安装插件列表，显示所有插件状态
+- **更新检测** - 通过git对比本地/远程commit，识别可更新插件
+- **详细报告** - 显示受影响插件、commits behind、更新命令
+- **一键更新** - 支持自动更新所有或指定的marketplace
+
+**使用场景**：
+- "检查技能更新"
+- "skill更新"
+- "插件升级"
+- "查看已安装skills"
+- "列出所有技能"
+- "有哪些插件"
+
+**命令**：
+- `/check-skills` - 检查所有技能和插件状态
+- `/update-skills` - 更新所有过期的marketplace插件
+
 ## 安装方法
 
 ### 在 Claude Code VSCode 扩展中安装
@@ -122,6 +144,7 @@ claude plugin install first-principles-planner@liuxiaoyusky
 claude plugin install ralph-loop@liuxiaoyusky
 claude plugin install linus-code-review@liuxiaoyusky
 claude plugin install dev-flow@liuxiaoyusky
+claude plugin install skill-checker@liuxiaoyusky
 ```
 
 ## 更新技能
@@ -179,6 +202,8 @@ claude plugin marketplace update ai-developer-skills
 "使用 linus-code-review 技能审查这段代码"
 
 "使用 dev-flow 技能管理开发任务"
+
+"使用 skill-checker 技能检查更新"
 ```
 
 ## 技能开发

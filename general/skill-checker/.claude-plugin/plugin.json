@@ -1,0 +1,9 @@
+{
+  "name": "skill-checker",
+  "version": "1.0.0",
+  "description": "Claude Skills管理工具 - 检查并列出本地skills和marketplace插件，检测插件更新并提示升级",
+  "author": {
+    "name": "AI Developer"
+  },
+  "keywords": ["skills", "plugins", "updates", "marketplace", "management"]
+}

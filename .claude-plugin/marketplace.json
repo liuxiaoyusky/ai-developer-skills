@@ -119,6 +119,19 @@
         "./masters_skills/skills/skills/skill-from-github",
         "./masters_skills/skills/skills/skill-from-notebook"
       ]
+    },
+    {
+      "name": "skill-checker",
+      "description": "Claude Skills 管理工具 - 检查并列出本地 skills 和 marketplace 插件，检测插件更新并提示升级。支持：本地skills扫描（区分官方/自定义）、Marketplace插件检查、通过git检测更新、详细报告（受影响插件、commits behind）、一键更新。触发场景：\"检查技能更新\"、\"skill更新\"、\"插件升级\"、\"查看已安装skills\"。",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./general/skill-checker/skills/skill-checker"
+      ],
+      "commands": [
+        "./general/skill-checker/commands/check-skills.md",
+        "./general/skill-checker/commands/update-skills.md"
+      ]
     }
   ]
 }
