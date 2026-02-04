@@ -103,6 +103,7 @@ Claude Skills 管理工具 - 检查并列出本地 skills 和 marketplace 插件
 - **更新检测** - 通过git对比本地/远程commit，识别可更新插件
 - **详细报告** - 显示受影响插件、commits behind、更新命令
 - **一键更新** - 支持自动更新所有或指定的marketplace
+- **My Skills** - 追踪和显示常用技能，记录使用历史
 
 **使用场景**：
 - "检查技能更新"
@@ -111,10 +112,14 @@ Claude Skills 管理工具 - 检查并列出本地 skills 和 marketplace 插件
 - "查看已安装skills"
 - "列出所有技能"
 - "有哪些插件"
+- "我的常用技能"
+- "使用记录"
+- "my-skills"
 
 **命令**：
 - `/check-skills` - 检查所有技能和插件状态
 - `/update-skills` - 更新所有过期的marketplace插件
+- `/my-skills` - 显示我的常用skills
 
 ## 安装方法
 

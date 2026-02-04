@@ -8,11 +8,14 @@ Claude Skills Checker - 检查本地skills和marketplace插件更新
     python3 check_skills.py --plugins    # 仅检查插件
     python3 check_skills.py --update     # 自动更新所有
     python3 check_skills.py --json       # 输出JSON格式
+    python3 check_skills.py --my-skills  # 显示我的常用skills
+    python3 check_skills.py --record <skill-name>  # 记录使用的skill
 """
 
 import json
 import os
 import subprocess
+from collections import Counter
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
@@ -405,6 +408,123 @@ class SkillsChecker:
         }
 
 
+@dataclass
+class SkillUsage:
+    """Skill使用记录"""
+    name: str
+    marketplace: str
+    last_used: str
+    use_count: int
+
+
+class SkillUsageTracker:
+    """Skill使用追踪器"""
+
+    def __init__(self, claude_dir: Optional[Path] = None):
+        self.claude_dir = claude_dir or Path.home() / ".claude"
+        self.history_file = self.claude_dir / "skills-usage.json"
+        self.usage_history: Dict[str, Dict] = {}
+        self._load_history()
+
+    def _load_history(self):
+        """加载使用历史"""
+        if self.history_file.exists():
+            try:
+                self.usage_history = json.loads(self.history_file.read_text())
+            except (json.JSONDecodeError, IOError):
+                self.usage_history = {}
+        else:
+            self.usage_history = {}
+
+    def _save_history(self):
+        """保存使用历史"""
+        self.history_file.parent.mkdir(parents=True, exist_ok=True)
+        self.history_file.write_text(
+            json.dumps(self.usage_history, indent=2, ensure_ascii=False)
+        )
+
+    def record_usage(self, skill_name: str, marketplace: str = "unknown"):
+        """记录skill使用"""
+        key = f"{skill_name}@{marketplace}"
+
+        if key not in self.usage_history:
+            self.usage_history[key] = {
+                "name": skill_name,
+                "marketplace": marketplace,
+                "first_used": datetime.now().isoformat(),
+                "last_used": datetime.now().isoformat(),
+                "use_count": 0
+            }
+
+        self.usage_history[key]["last_used"] = datetime.now().isoformat()
+        self.usage_history[key]["use_count"] += 1
+        self._save_history()
+
+        return self.usage_history[key]
+
+    def get_top_skills(self, limit: int = 10) -> List[SkillUsage]:
+        """获取最常用的skills"""
+        skills = []
+        for key, data in self.usage_history.items():
+            skills.append(SkillUsage(
+                name=data["name"],
+                marketplace=data["marketplace"],
+                last_used=data["last_used"],
+                use_count=data["use_count"]
+            ))
+
+        return sorted(skills, key=lambda x: x.use_count, reverse=True)[:limit]
+
+    def get_recent_skills(self, limit: int = 10) -> List[SkillUsage]:
+        """获取最近使用的skills"""
+        skills = []
+        for key, data in self.usage_history.items():
+            skills.append(SkillUsage(
+                name=data["name"],
+                marketplace=data["marketplace"],
+                last_used=data["last_used"],
+                use_count=data["use_count"]
+            ))
+
+        return sorted(skills, key=lambda x: x.last_used, reverse=True)[:limit]
+
+    def print_my_skills(self):
+        """打印我的常用skills"""
+        top_skills = self.get_top_skills(15)
+        recent_skills = self.get_recent_skills(10)
+
+        print("=" * 60)
+        print("⭐ 我的常用 Skills")
+        print("=" * 60)
+
+        if not top_skills:
+            print("\n📝 还没有使用记录")
+            print("\n💡 提示：使用技能时会自动记录使用历史")
+            print("   或者手动记录: python3 check_skills.py --record <skill-name>")
+        else:
+            print(f"\n🔥 最常用 (Top {len(top_skills)})")
+            print("-" * 60)
+
+            for i, skill in enumerate(top_skills, 1):
+                last_used = datetime.fromisoformat(skill.last_used).strftime("%Y-%m-%d %H:%M")
+                print(f"{i:2}. {skill.name}")
+                print(f"    来源: {skill.marketplace}")
+                print(f"    使用次数: {skill.use_count}")
+                print(f"    最后使用: {last_used}")
+                print()
+
+            print("\n🕐 最近使用")
+            print("-" * 60)
+
+            for i, skill in enumerate(recent_skills[:10], 1):
+                last_used = datetime.fromisoformat(skill.last_used).strftime("%m-%d %H:%M")
+                print(f"{i:2}. {skill.name} ({skill.marketplace}) - {last_used}")
+
+        print("\n" + "=" * 60)
+        print(f"💾 数据文件: {self.history_file}")
+        print("=" * 60)
+
+
 def main():
     """主函数"""
     import argparse
@@ -414,9 +534,27 @@ def main():
     parser.add_argument("--plugins", action="store_true", help="仅检查插件")
     parser.add_argument("--update", nargs="?", const="all", help="更新marketplace")
     parser.add_argument("--json", action="store_true", help="输出JSON格式")
+    parser.add_argument("--my-skills", action="store_true", help="显示我的常用skills")
+    parser.add_argument("--record", type=str, metavar="SKILL", help="记录使用的skill")
+    parser.add_argument("--marketplace", type=str, default="unknown", help="指定skill的marketplace (配合--record使用)")
     parser.add_argument("--claude-dir", type=Path, help="Claude配置目录路径")
 
     args = parser.parse_args()
+
+    # 处理 --my-skills
+    if args.my_skills:
+        tracker = SkillUsageTracker(args.claude_dir)
+        tracker.print_my_skills()
+        return
+
+    # 处理 --record
+    if args.record:
+        tracker = SkillUsageTracker(args.claude_dir)
+        result = tracker.record_usage(args.record, args.marketplace)
+        print(f"✅ 已记录: {result['name']} (来源: {result['marketplace']})")
+        print(f"   使用次数: {result['use_count']}")
+        print(f"   最后使用: {result['last_used']}")
+        return
 
     checker = SkillsChecker(args.claude_dir)
 

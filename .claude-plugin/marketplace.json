@@ -130,7 +130,8 @@
       ],
       "commands": [
         "./general/skill-checker/commands/check-skills.md",
-        "./general/skill-checker/commands/update-skills.md"
+        "./general/skill-checker/commands/update-skills.md",
+        "./general/skill-checker/commands/my-skills.md"
       ]
     }
   ]

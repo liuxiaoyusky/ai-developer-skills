@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.1.0] - 2026-02-04
+
+### Added
+- ⭐ **My Skills 功能** - 追踪和显示常用技能
+- ✨ 使用历史记录 - 自动记录每次skill使用
+- ✨ 使用统计功能 - 显示最常用和最近使用的skills
+- 📝 /my-skills 命令 - 快速查看常用技能
+- 📝 `--my-skills` 选项 - 显示常用skills列表
+- 📝 `--record` 选项 - 手动记录使用的skill
+- 💾 skills-usage.json - 使用历史存储文件
+
+### Features
+- 支持记录skill使用次数和最后使用时间
+- 按使用频率和最近使用时间排序
+- 显示技能来源marketplace
+- 可手动编辑使用历史
+- 跨平台支持（Linux/macOS/Windows）
+
 ## [1.0.0] - 2026-02-04
 
 ### Added
