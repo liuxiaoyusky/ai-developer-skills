@@ -10,7 +10,15 @@
       "Bash(done)",
       "Bash(find:*)",
       "Bash(git submodule update:*)",
-      "Bash(git submodule:*)"
+      "Bash(git submodule:*)",
+      "Bash(for dir in ~/.claude/plugins/cache/*/)",
+      "Bash(do if [ -d \"$dir/.git\" ])",
+      "Bash(while read dir)",
+      "Bash(then cd \"$dir\")",
+      "Bash(echo \"$dir\" fi done)",
+      "Bash(echo:*)",
+      "Bash(else)",
+      "Bash(fi:*)"
     ]
   }
 }
