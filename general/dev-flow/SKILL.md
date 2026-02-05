@@ -12,7 +12,7 @@ alwaysActivate: true
 > - 🔄 **完整闭环**：任务识别 → 分析拆解（调用first-principles）→ 执行 → 测试验证 → 错误处理（调用dev-debug）
 >
 > **协作技能**：
-> - dev-loop：多任务自动迭代（"开始迭代"触发），检测 `<promise>COMPLETE</promise>` 信号
+> - dev-loop：多任务自动迭代（"开始迭代"触发），检测 COMPLETE 信号判断完成
 > - dev-debug：测试失败时自动调用
 > - first-principles：任务拆解时调用
 > - dev-review：代码变更时自动激活
@@ -154,9 +154,17 @@ Read tasks.md
 优先级顺序：
   1. 进行中 (IN PROGRESS) 的任务 → 直接进入 Step 3
   2. 待处理 (TODO) 中的第一个任务 → 进入 Step 2
-  3. 如果没有任务 → 询问用户是否需要添加新任务
+  3. 如果没有任务 → 输出完成信号，结束本次执行
 
-# 3. 显示任务（严禁询问确认，直接开始）
+# 3. 检测是否所有任务完成
+如果没有待处理任务：
+  AI: "✅ 所有任务已完成！
+       检测到 tasks.md 中无待处理任务
+
+       <promise>COMPLETE</promise>"
+  结束本次执行（不进入后续步骤）
+
+# 4. 显示任务（严禁询问确认，直接开始）
 AI: "📋 找到任务：<任务描述>
      开始处理..."
 ```
@@ -205,7 +213,7 @@ AI: "📋 找到任务：<任务描述>
 检查是否有"待处理"任务？
   ├─ YES → 显示第一个任务 → 直接进入 Step 2（禁止询问）
   └─ NO  ↓
-询问用户是否添加新任务
+所有任务完成 → 输出 <promise>COMPLETE</promise> → 结束本次执行
 ```
 
 ---
@@ -505,7 +513,7 @@ Read task-details-test.md
 - ❌ **禁止未测试就标记完成** - 必须完成所有测试步骤
 - ✅ 如果所有测试通过 → 自动更新 tasks.md
 - ✅ 如果有测试失败 → 自动进入 Step 5
-- ✅ **必须输出完成信号**：`<promise>COMPLETE</promise>`（供 dev-loop 检测）
+- ❌ **禁止在此输出 COMPLETE 信号** - COMPLETE 只在 Step 1 无任务时输出
 
 ## 4.3 测试结果汇总
 
@@ -517,9 +525,7 @@ AI: "📊 测试结果汇总：
 
      总体结果：全部通过 ✓
 
-     任务完成！已更新 tasks.md
-
-     <promise>COMPLETE</promise>"
+     任务完成！已更新 tasks.md"
 ```
 
 **更新 tasks.md**：
@@ -596,7 +602,7 @@ npm test
 - 如果修复成功 → 返回 Step 4 继续测试
 - 如果仍然失败 → 重复 Step 5
 
-## 5.4 完成信号
+## 5.4 修复完成
 
 AI: "🔧 问题已修复！
 
@@ -691,7 +697,6 @@ Step 4: 测试验证（自动执行，不询问）
   → 手动测试注销功能：✅ 正常
 
   → 更新 tasks.md：移动到 DONE
-  → 输出完成信号：<promise>COMPLETE</promise>
 ```
 
 ### 示例 2：复杂任务（需要拆解）
@@ -752,7 +757,6 @@ Step 5: 错误处理
 
   → 所有测试通过 ✅
   → 更新 tasks.md：移动到 DONE
-  → 输出完成信号：<promise>COMPLETE</promise>
 ```
 
 ---
