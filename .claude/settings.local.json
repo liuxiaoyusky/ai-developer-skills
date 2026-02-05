@@ -1,7 +1,16 @@
 {
   "permissions": {
     "allow": [
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(for dir in /Users/xiaoyuliu/Documents/github/ai-developer-skills/*/)",
+      "Bash(do)",
+      "Bash(if [ -d \"$dir/.git\" ])",
+      "Bash(then)",
+      "Bash(fi)",
+      "Bash(done)",
+      "Bash(find:*)",
+      "Bash(git submodule update:*)",
+      "Bash(git submodule:*)"
     ]
   }
 }
