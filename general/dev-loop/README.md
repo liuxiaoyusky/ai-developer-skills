@@ -39,21 +39,33 @@ dev-loop 是一个自动迭代调度器，通过简单的循环让 Claude Code �
 
 ## 快速开始
 
-### 方式 1：使用模板文件（推荐）
+### 方式 1：Shell 脚本（推荐生产环境）
 
 ```bash
-# 1. 复制模板文件
+# 1. 复制脚本和模板
+cp templates/loop.sh loop.sh
 cp templates/TASKS.template.md tasks.md
-cp templates/loop.sample.js loop.js
 
 # 2. 编辑任务
-vim tasks.md  # 添加你的任务
+vim tasks.md
 
-# 3. 运行（跨平台）
-node loop.js
-# 或添加执行权限后直接运行
-chmod +x loop.js && ./loop.js
+# 3. 运行
+bash loop.sh
+# 或添加执行权限
+chmod +x loop.sh && ./loop.sh
 ```
+
+**特性**：
+- ✅ 彩色输出（进度统计、耗时显示）
+- ✅ 错误容错（失败后继续）
+- ✅ 跨平台（macOS/Linux）
+- ✅ 支持限制最大迭代次数：`./loop.sh --max 10`
+
+**⚠️ 安全说明**：
+此脚本使用 `--dangerously-skip-permissions` 参数以实现无人值守运行。在运行前，请务必：
+1. 仔细审查 `tasks.md` 中的所有任务
+2. 确认任务范围在可接受的风险内
+3. 如有疑问，先手动执行 dev-flow 测试
 
 ### 方式 2：极简使用（5 行核心代码）
 
@@ -84,7 +96,7 @@ dev-loop/
 ├── README.md             # 用户文档
 ├── templates/            # 模板文件
 │   ├── TASKS.template.md      # 任务清单模板
-│   └── loop.sample.js         # 跨平台循环脚本（带进度显示）
+│   └── loop.sh                 # Shell 脚本
 └── LICENSE               # MIT License
 ```
 
@@ -176,47 +188,40 @@ while grep -q "^\- \[ \]" tasks.md; do
 done
 ```
 
-## 可选增强
+## 高级用法
 
-### 显示迭代进度
-
-```bash
-#!/bin/bash
-iteration=0
-while grep -q "^\- \[ \]" tasks.md; do
-  iteration=$((iteration + 1))
-  echo "=== 迭代 #$iteration ==="
-  claude "使用 dev-flow 技能处理下一个任务"
-done
-echo "✅ 完成！共 $iteration 次迭代"
-```
-
-### Git 自动提交
+### 限制最大迭代次数
 
 ```bash
-#!/bin/bash
-iteration=0
-while grep -q "^\- \[ \]" tasks.md; do
-  iteration=$((iteration + 1))
-  claude "使用 dev-flow 技能处理下一个任务"
-  git add -A && git commit -m "iteration $iteration"
-done
+# 最多执行 10 次迭代后停止（即使任务未完成）
+./loop.sh --max 10
 ```
 
-### 完整版 loop.js
+### 与 Git 自动提交结合
 
-使用模板获取增强版本：
+修改 loop.sh，在循环中添加 git 提交：
+
 ```bash
-cp templates/loop.sample.js loop.js
+# 在每次迭代后提交
+git add -A && git commit -m "iteration $iteration"
 ```
 
-增强版特性：
-- ✅ 迭代计数器
-- ✅ 进度统计（待处理/已完成）
-- ✅ 耗时显示
-- ✅ 彩色输出（跨平台）
-- ✅ 错误处理
-- ✅ Windows/macOS/Linux 通用
+### 自定义注意事项
+
+创建 `caution.md` 文件来强制执行项目规则：
+
+```markdown
+# ⚠️ 开发注意事项
+
+## 强制规则
+
+- 禁止未测试就标记任务完成
+- 禁止直接修改核心配置文件
+- 禁止提交包含 console.log 的代码
+- 所有 API 变更必须更新文档
+```
+
+每次运行 loop.sh 时，这些规则都会自动显示。
 
 ## 最佳实践
 
@@ -226,23 +231,31 @@ cp templates/loop.sample.js loop.js
 - **任务足够清晰** - 让 dev-flow 能理解和执行
 - **信任标准化流程** - dev-flow 会处理拆解、执行、测试
 - **查看日志** - 使用 `cat dev-flow.log` 了解执行细节
+- **事前审查任务** - 使用 `--dangerously-skip-permissions` 前务必审查所有任务
+- **使用 caution.md** - 定义项目强制规则，防止意外操作
+- **先测试再自动化** - 不确定时先手动运行一次 dev-flow
 
 ### ❌ 避免
 
 - **在 tasks.md 中写详细实现** - dev-flow 会自己决定
 - **任务过于宽泛** - "实现完整应用" 太大
 - **手动干预循环** - 让 AI 自己完成
+- **跳过安全审查** - 不要在未审查任务的情况下运行自动化脚本
+- **在生产环境直接运行** - 先在测试环境验证流程
 
 ## 故障排除
 
 **Q: 循环卡住怎么办？**
-A: 检查 `dev-flow.log` 查看详细日志，找出卡住的步骤
+A: 按 `Ctrl+C` 停止，然后检查 `dev-flow.log` 查看详细日志，找出卡住的步骤
 
 **Q: 如何停止循环？**
-A: 按 `Ctrl+C`
+A: 按 `Ctrl+C`，或使用 `--max N` 限制最大迭代次数
 
 **Q: 任务失败会怎样？**
-A: 任务保持在 TODO，下次继续；debug 技能会记录错题集
+A: loop.sh 使用 `|| true` 确保失败后继续，任务保持在 TODO，下次继续；debug 技能会记录错题集
+
+**Q: 如何安全地使用 --dangerously-skip-permissions？**
+A: 1) 先手动执行 dev-flow 测试 2) 仔细审查 tasks.md 3) 使用 caution.md 定义强制规则 4) 考虑使用 --max N 限制迭代次数
 
 **Q: 与旧版 dev-loop 的区别？**
 A: 新版不再直接实现任务，而是调用 dev-flow 执行标准化流程
@@ -279,7 +292,7 @@ MIT License - 详见 [LICENSE](LICENSE)
 
 ---
 
-**版本**: v4.0.0 (Ralph → Dev Flow)
-**最后更新**: 2025-01-30
+**版本**: v4.1.0 (添加 Shell 脚本支持)
+**最后更新**: 2025-02-05
 
 **极简即是强大！** 🚀

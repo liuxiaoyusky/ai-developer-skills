@@ -14,7 +14,7 @@ description: 自动迭代调度器 - 循环调用 dev-flow 完成所有任务。
 **基本真理**：
 1. **需要多次迭代** → `while` 循环
 2. **状态必须持久化** → tasks.md
-3. **检测完成** → 检查 checkbox 状态
+3. **检测完成** → dev-flow 主动报告 `<promise>COMPLETE</promise>` 信号
 4. **执行标准化** → 调用 dev-flow
 
 **新架构**（推荐）：
@@ -269,6 +269,29 @@ OUTPUT=$(claude --print 2>&1 | tee /dev/stderr) || true
   ↓
 CLI 退出，loop.sh 继续下一次迭代
 ```
+
+### 完成检测机制
+
+**dev-flow 主动报告**：
+- dev-flow 在 Step 1 检测 tasks.md
+- 发现无待处理任务时输出 `<promise>COMPLETE</promise>` 信号
+- loop.sh 检测到信号后立即退出
+
+**流程图**：
+```
+dev-flow 执行
+  ↓
+Step 1: 检测 tasks.md
+  ├─ 有待处理任务 → 继续执行 5 步
+  └─ 无待处理任务 → 输出 <promise>COMPLETE</promise>
+      ↓
+loop.sh 检测到信号 → 退出
+```
+
+**优势**：
+- ✅ 更早发现：dev-flow 启动时立即检查
+- ✅ 语义清晰：dev-flow 主动报告"我完成了"
+- ✅ 代码简洁：单一检测点，易于维护
 
 ---
 

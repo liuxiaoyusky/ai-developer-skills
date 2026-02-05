@@ -13,10 +13,11 @@
 # 2. 运行: chmod +x loop.sh && ./loop.sh [--max N]
 #
 # 参数说明：
-#   --max N         设置最大迭代次数（默认：无限循环，直到检测到完成信号）
+#   --max N         设置最大迭代次数（默认：无限循环）
 #
-# 完成信号：
-#   当 Claude 输出包含 <promise>COMPLETE</promise> 时，循环自动结束
+# 完成检测：
+#   当 dev-flow 检测到 tasks.md 中无待处理任务时，
+#   会输出 <promise>COMPLETE</promise> 信号，loop.sh 检测到后自动退出
 
 set -e  # 遇到错误退出（但在 AI 调用处使用 || true 覆盖）
 
@@ -222,7 +223,7 @@ while true; do
   echo "  耗时：${minutes}分${seconds}秒"
   echo ""
 
-  # 检查完成信号
+  # 检查完成信号（dev-flow 主动报告完成）
   if echo "$OUTPUT" | grep -q "COMPLETE"; then
     echo ""
     log_green "==============================================================="
