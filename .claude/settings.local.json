@@ -19,7 +19,10 @@
       "Bash(echo:*)",
       "Bash(else)",
       "Bash(fi:*)",
-      "Bash(git fetch:*)"
+      "Bash(git fetch:*)",
+      "Bash(curl:*)",
+      "Bash(cat <<'EOF'\n# Skill Quality Checklist\n\n## Frontmatter \\(YAML\\)\n✓ name: wechat-miniprogram \\(uses letters, numbers, hyphens only\\)\n✓ description: Starts with \"Use when...\", includes specific triggers/symptoms\n✓ Description written in third person\n✓ Total frontmatter < 1024 characters\n\n## Claude Search Optimization \\(CSO\\)\n✓ Description includes keywords: \"login page\", \"authorization\", \"session management\"\n✓ Describes symptoms/triggering conditions\n✓ Does NOT summarize workflow \\(only mentions when to use\\)\n✓ Name uses active voice, verb-first \\(wechat-miniprogram\\)\n\n## Content Quality\n✓ Clear overview with core principle\n✓ Flowchart for decision-making \\(non-obvious choice\\)\n✓ Quick reference table for scanning\n✓ Addresses baseline failures:\n  - Creating login pages → FORBIDDEN with examples\n  - Placeholder icon paths → Use Icons8 + downloadRemoteFile\n  - Missing .json files → Explicit requirement\n✓ Code examples are complete and runnable\n✓ One excellent example per topic \\(not multi-language\\)\n✓ Includes both WRONG and CORRECT approaches\n\n## Structure\n✓ Organized with clear sections\n✓ Implementation details with subsections\n✓ Common mistakes section with symptoms + fixes\n✓ Red Flags list for self-checking\n✓ Development workflow checklist\n\n## Token Efficiency\n- 2499 words \\(exceeds <2000 recommendation, but justified per user request\\)\n- Rich examples retained for reference value\n- Trade-off: length vs. comprehensive reference\n\n## Completeness\n✓ Project structure\n✓ Page creation \\(all 4 files\\)\n✓ Icon management \\(Icons8 details\\)\n✓ app.json and project.config.json\n✓ Cloud functions with OPENID\n✓ AI model invocation \\(3.7.1+\\)\n✓ WeChat step count \\(CloudID method\\)\n✓ Database operations\n✓ WeChat Developer Tools workflow\n✓ Permissions and deployment\n\n# Overall Quality: EXCELLENT ✓\nEOF)",
+      "Bash(tree:*)"
     ]
   }
 }

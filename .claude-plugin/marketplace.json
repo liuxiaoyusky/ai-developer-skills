@@ -5,8 +5,8 @@
     "email": "noreply@github.com"
   },
   "metadata": {
-    "description": "AI 辅助开发技能集合 - 包含开发流程、任务管理、代码审查、调试、第一性原理等实用技能",
-    "version": "2.0.0"
+    "description": "AI 辅助开发技能集合 - 包含开发流程、任务管理、代码审查、调试、第一性原理、微信小程序开发等实用技能",
+    "version": "2.1.0"
   },
   "plugins": [
     {
@@ -141,6 +141,24 @@
         "./general/skill-checker/commands/check-skills.md",
         "./general/skill-checker/commands/update-skills.md",
         "./general/skill-checker/commands/my-skills.md"
+      ]
+    },
+    {
+      "name": "n8n-mcp-workflow",
+      "description": "n8n MCP 开发和工作流自动化 - 创建 MCP 服务器与 n8n 集成，程序化生成 n8n 工作流。包含完整的 MCP 服务器模板、节点类型参考、连接模式、工作流创建模式和最佳实践。适用于需要将 AI Agent 与 n8n 集成、自动化工作流部署、动态生成工作流的场景。",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./general/n8n-mcp-workflow/skills/n8n-mcp-workflow"
+      ]
+    },
+    {
+      "name": "wechat-miniprogram",
+      "description": "微信小程序 CloudBase 开发技能 - 基于 TDD 方法创建，包含无登录认证、页面创建规范、图标资源管理、AI 模型调用、微信步数获取、数据库操作等完整开发指南。**核心原则**：小程序+CloudBase 天然无登录，使用 OPENID 获取用户身份。触发场景：\"开发微信小程序\"、\"小程序登录\"、\"创建小程序页面\"、\"配置 tabBar\"、\"小程序云函数\"。",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./wechat-miniprogram"
       ]
     }
   ]

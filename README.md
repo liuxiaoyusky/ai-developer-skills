@@ -121,6 +121,55 @@ Claude Skills 管理工具 - 检查并列出本地 skills 和 marketplace 插件
 - `/update-skills` - 更新所有过期的marketplace插件
 - `/my-skills` - 显示我的常用skills
 
+### 11. WeChat Mini Program Development (wechat-miniprogram)
+微信小程序 CloudBase 开发技能 - 基于 TDD 方法创建，包含无登录认证、页面创建规范、图标资源管理、AI 模型调用、微信步数获取、数据库操作等完整开发指南。
+
+**核心原则**：
+- 小程序+CloudBase 天然无登录，使用 OPENID 获取用户身份
+- 页面必须包含 4 个文件（.wxml, .wxss, .js, .json）
+- 图标使用 Icons8 + downloadRemoteFile 工具
+- AI 模型调用支持（基础库 3.7.1+）
+- 微信步数使用 CloudID 方法
+
+**使用场景**：
+- "开发微信小程序"
+- "创建小程序页面"
+- "小程序登录功能"
+- "配置 tabBar"
+- "小程序云函数"
+- "微信步数获取"
+- "小程序 AI 调用"
+
+**主要内容**：
+- 无登录认证模式（OPENID 直接获取）
+- 完整的页面创建示例（4 个文件）
+- Icons8 图标管理指南
+- app.json 和 project.config.json 配置
+- 云函数开发最佳实践
+- AI 模型调用示例（DeepSeek、混元等）
+- 微信步数获取（CloudID 方法）
+- 数据库 CRUD 操作
+- WeChat Developer Tools 工作流
+- 常见错误和 Red Flags 检查清单
+
+### 12. n8n MCP & Workflow Automation (general/n8n-mcp-workflow)
+n8n MCP 开发和工作流自动化技能 - 创建 MCP 服务器与 n8n 集成，程序化生成 n8n 工作流。包含完整的 TypeScript MCP 服务器模板、常用节点类型参考、连接模式、工作流创建模式和最佳实践。
+
+**使用场景**：
+- "创建 n8n MCP 服务器"
+- "生成 n8n workflow"
+- "n8n 工作流自动化"
+- "使用 n8n API 创建工作流"
+- "n8n 和 AI Agent 集成"
+
+**主要内容**：
+- 完整的 MCP 服务器模板（4个核心工具）
+- n8n 工作流 JSON 结构详解
+- 常用节点类型（Webhook, HTTP Request, Code, Set, IF）
+- 连接模式（线性流、条件分支、多输出）
+- 3种工作流创建模式
+- Top 5 常见错误和最佳实践
+
 ## 安装方法
 
 ### 在 Claude Code VSCode 扩展中安装
@@ -150,6 +199,7 @@ claude plugin install ralph-loop@liuxiaoyusky
 claude plugin install linus-code-review@liuxiaoyusky
 claude plugin install dev-flow@liuxiaoyusky
 claude plugin install skill-checker@liuxiaoyusky
+claude plugin install wechat-miniprogram@liuxiaoyusky
 ```
 
 ## 更新技能
@@ -209,6 +259,8 @@ claude plugin marketplace update ai-developer-skills
 "使用 dev-flow 技能管理开发任务"
 
 "使用 skill-checker 技能检查更新"
+
+"使用 wechat-miniprogram 技能开发微信小程序"
 ```
 
 ## 技能开发
