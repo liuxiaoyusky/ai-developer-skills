@@ -18,7 +18,8 @@
       "Bash(echo \"$dir\" fi done)",
       "Bash(echo:*)",
       "Bash(else)",
-      "Bash(fi:*)"
+      "Bash(fi:*)",
+      "Bash(git fetch:*)"
     ]
   }
 }
