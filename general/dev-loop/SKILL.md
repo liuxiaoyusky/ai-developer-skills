@@ -37,40 +37,97 @@ dev-loop（直接实现）
 
 ---
 
+## loop.sh 源码（推荐）
+
+**源码位置**：[templates/loop.sh](templates/loop.sh)
+
+**版本**：2025-02-04
+
+**⭐ 为什么推荐 bash 版本？**
+
+基于 Ralph ([snarktank/ralph](https://github.com/snarktank/ralph)) 的实践经验：
+
+| 特性 | Bash (loop.sh) |
+|------|----------------|
+| **实时输出** | ✅ `2>&1 \| tee /dev/stderr` |
+| **自动继续** | ✅ `\|\| true` 确保循环不中断 |
+| **跨平台** | ✅ Windows(Git Bash)/macOS/Linux |
+| **调试友好** | ✅ 每行输出可见 |
+
+**关键实现**（类似 Ralph）：
+```bash
+# 同时实现实时输出 + 捕获
+OUTPUT=$(claude --print 2>&1 | tee /dev/stderr) || true
+```
+
+**⚠️ 重要**：
+- loop.sh 是**唯一的源码文件**
+- dev-loop skill 激活时从 loop.sh 读取并生成 loop.sh
+- 只需维护一份代码，符合 DRY 原则
+- 支持 Windows(Git Bash)、macOS、Linux
+
+---
+
 ## 快速开始
 
 ### 激活时的行为
 
 **当用户说"开始迭代"、"启动迭代"、"dev-loop"时**：
 
-1. **检查是否存在 tasks.md 和 loop.js**
-2. **如果都不存在** → 创建这两个文件（从模板或默认内容）
-3. **创建完成后立即停止** → 不要运行、不要检查、不要询问
-4. **让用户自己决定何时运行** `node loop.js`
+1. **检查是否存在 tasks.md 和 loop.sh**
+2. **如果 loop.sh 不存在** → 从 `templates/loop.sh` 读取并生成 loop.sh
+3. **如果 loop.sh 已存在** → 检查版本，过时则提示更新
+4. **如果 tasks.md 不存在** → 创建默认模板
+5. **创建完成后立即停止** → 不要运行、不要检查、不要询问
+6. **让用户自己决定何时运行** `chmod +x loop.sh && ./loop.sh`
 
 **重要**：
 - ✅ 生成文件后立即停止
-- ❌ 不要自动运行 loop.js
+- ❌ 不要自动运行 loop.sh
 - ❌ 不要检查文件内容
 - ❌ 不要询问"是否要开始"
 
-### 方式 1：使用模板文件（推荐）
+**版本机制**：
+- loop.sh 顶部包含 `# 版本：2025-02-04`
+- 每次激活时检查版本，不匹配则警告用户重新生成
+- **源码唯一来源**：templates/loop.sh
+
+### 方式 1：自动生成（推荐）✅
 
 ```bash
-# 1. 复制模板文件
-cp templates/TASKS.template.md tasks.md
-cp templates/loop.sample.js loop.js
+# 1. 调用 dev-loop skill 自动生成
+claude "开始迭代"  # 从 templates/loop.sh 读取并生成 loop.sh
 
 # 2. 编辑任务
 vim tasks.md  # 添加你的任务
 
-# 3. 运行（跨平台）
-node loop.js
-# 或添加执行权限后直接运行
-chmod +x loop.js && ./loop.js
+# 3. 添加执行权限并运行
+chmod +x loop.sh && ./loop.sh [--max N]
 ```
 
-### 方式 2：直接使用（5 行核心代码）
+**优点**：
+- ✅ 永远是最新版本（直接从 loop.sh 读取）
+- ✅ 实时输出，调试友好（基于 Ralph 实践）
+- ✅ 包含 caution.md 检测逻辑
+- ✅ 自动继续，不会因单个错误中断
+
+### 方式 2：手动复制（备用）
+
+```bash
+# 1. 复制模板文件
+cp templates/TASKS.template.md tasks.md
+cp templates/loop.sh loop.sh
+
+# 2. 编辑任务
+vim tasks.md  # 添加你的任务
+
+# 3. 添加执行权限并运行
+chmod +x loop.sh && ./loop.sh
+```
+
+**⚠️ 注意**：手动复制后，loop.sh 更新时需要手动同步。建议使用方式 1。
+
+### 方式 3：直接使用（5 行核心代码）
 
 ```bash
 # 1. 创建任务文件
@@ -100,11 +157,17 @@ done
 dev-loop/
 ├── SKILL.md              # 技能定义（本文档）
 ├── README.md             # 用户文档
-├── templates/            # 模板文件
+├── templates/            # 模板文件（源码）
 │   ├── TASKS.template.md      # 任务清单模板
-│   └── loop.sample.js         # 跨平台循环脚本（带进度显示）
+│   └── loop.sh                # ⭐ loop.sh 唯一源码文件（bash 版本）
 └── LICENSE               # MIT License
 ```
+
+**⚠️ 重要**：
+- **loop.sh 是唯一的实现方式**（基于 Ralph 实践，支持实时输出）
+- dev-loop skill 激活时默认生成 loop.sh
+- 修改源码后，删除生成的文件重新生成即可应用更新
+- 支持 Windows(Git Bash)、macOS、Linux
 
 ### tasks.md（任务清单）
 
@@ -128,32 +191,43 @@ cp templates/TASKS.template.md tasks.md
 - `- [x]` 已完成
 - 全部 `- [x]` 时循环自动停止
 
-### loop.js（跨平台脚本）
+### loop.sh（推荐：跨平台 bash 脚本）
 
-**5 行核心版本**：
-```javascript
-const { execSync } = require('child_process');
-const fs = require('fs');
+**源码位置**：[templates/loop.sh](templates/loop.sh)
 
-while (fs.readFileSync('tasks.md', 'utf-8').includes('- [ ]')) {
-  execSync('claude "使用 dev-flow 技能处理下一个任务"', { stdio: 'inherit' });
-}
-console.log('✅ 所有任务完成！');
-```
+**版本**：2025-02-04
 
-**增强版（带进度显示）**：使用模板
+**⚠️ 推荐生成方式**：
 ```bash
-cp templates/loop.sample.js loop.js
-node loop.js
+claude "开始迭代"  # 从 loop.sh 自动生成
 ```
 
-增强版特性：
+**5 行核心版本**（简化参考）：
+```bash
+while grep -q "^\- \[ \]" tasks.md; do
+  claude --print "使用 dev-flow 技能处理下一个任务" 2>&1 | tee /dev/stderr || true
+done
+```
+
+**关键技巧**（类似 Ralph）：
+```bash
+# 同时实现实时输出 + 捕获输出
+OUTPUT=$(claude --print 2>&1 | tee /dev/stderr) || true
+```
+
+- `2>&1` - 将 stderr 重定向到 stdout
+- `| tee /dev/stderr` - 同时显示到终端和捕获到变量
+- `|| true` - 无论成功失败都继续循环
+
+**完整版特性**（见 loop.sh）：
 - ✅ 迭代计数器
 - ✅ 进度统计（待处理/已完成）
 - ✅ 耗时显示
 - ✅ 彩色输出（跨平台 ANSI）
-- ✅ 错误处理
-- ✅ Windows/macOS/Linux 通用
+- ✅ 错误处理（自动继续）
+- ✅ Windows(Git Bash)/macOS/Linux 通用
+- ✅ **实时流式输出**（类似 Ralph）
+- ✅ **caution.md 检测**（启动时强制检查）
 
 ---
 
@@ -193,7 +267,7 @@ node loop.js
   - 成功：更新 tasks.md，任务移到 DONE
   - 失败：保持在 TODO，下次继续
   ↓
-CLI 退出，loop.js 继续下一次迭代
+CLI 退出，loop.sh 继续下一次迭代
 ```
 
 ---
@@ -225,15 +299,45 @@ while grep -q "^\- \[ \]" tasks.md; do
 done
 ```
 
-### 完整版 loop.js（带进度显示）
+---
 
-使用模板获取：
+## 版本管理
+
+### 版本检测机制
+
+**源码版本**：loop.sh 顶部包含版本标识：
 ```bash
-cp templates/loop.sample.js loop.js
-node loop.js
+# 版本：2025-02-04
 ```
 
-完整版包含所有增强功能：迭代计数、进度统计、耗时显示、彩色输出、错误处理。
+**更新流程**：
+1. 修改 loop.sh 时递增版本号
+2. 运行 dev-loop 时自动检测版本
+3. 如果版本过旧，显示警告：
+   ```
+   ⚠️  loop.sh 版本过时（当前：2025-01-30，最新：2025-02-04）
+      请运行：claude "开始迭代" 重新生成
+   ```
+
+### 强制更新
+
+如果需要强制更新 loop.sh：
+```bash
+# 删除旧版本
+rm loop.sh
+
+# 重新生成（从 templates/loop.sh 读取）
+claude "开始迭代"
+```
+
+### 修改 loop.sh
+
+**⚠️ 不要直接修改生成的 loop.sh**（重新生成时会丢失）：
+
+**正确做法**：
+1. 修改 `templates/loop.sh`
+2. 删除生成的 `loop.sh`
+3. 运行 `claude "开始迭代"` 重新生成
 
 ---
 
@@ -242,7 +346,7 @@ node loop.js
 | 场景 | 使用方法 |
 |------|----------|
 | 单次任务 | `claude "使用 dev-flow 技能"` |
-| 长期项目 | `node loop.js` |
+| 长期项目 | `./loop.sh` |
 | 自动迭代 | dev-loop + Dev Flow |
 
 ---
@@ -274,6 +378,35 @@ A: 按 `Ctrl+C`
 
 **Q: 任务失败会怎样？**
 A: 任务保持在 TODO，下次继续；debug 技能会记录错题集
+
+**Q: 实时输出不工作怎么办？**
+A: 确保使用 loop.sh，并确认 claude 命令包含 `--print` 参数
+
+**Q: 如何更新 loop.sh 到最新版本？**
+A:
+```bash
+rm loop.sh  # 删除旧版本
+claude "开始迭代"  # 重新生成
+```
+
+**Q: loop.sh 和 templates/loop.sh 有什么区别？**
+A:
+- `templates/loop.sh`：**唯一的源码文件**，所有修改都在这里进行
+- `loop.sh`：运行文件，从 templates/loop.sh 自动生成
+- **推荐**：不要直接修改 loop.sh，修改 templates/loop.sh 后重新生成
+
+**Q: 如何修改 loop.sh？**
+A:
+```bash
+# 1. 修改源码
+vim templates/loop.sh
+
+# 2. 删除旧版本
+rm loop.sh
+
+# 3. 重新生成
+claude "开始迭代"
+```
 
 ---
 
@@ -325,7 +458,8 @@ A: 任务保持在 TODO，下次继续；debug 技能会记录错题集
 
 ---
 
-**版本**: v4.0.0 (Ralph → Dev Flow)
-**最后更新**: 2025-01-30
+**版本**: v6.0.0 (bash 版本，基于 Ralph 实践)
+**最后更新**: 2025-02-04
+**loop.sh 版本**: 2025-02-04
 
 **极简即是强大！** 🚀
