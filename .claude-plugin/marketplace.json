@@ -6,7 +6,7 @@
   },
   "metadata": {
     "description": "AI 辅助开发技能集合 - 包含开发流程、任务管理、代码审查、调试、第一性原理、微信小程序开发等实用技能",
-    "version": "2.1.0"
+    "version": "3.0.0"
   },
   "plugins": [
     {
@@ -38,7 +38,7 @@
     },
     {
       "name": "dev-debug",
-      "description": "系统化问题解决技能 - 整合 5 Whys 根因分析、第一性原理重建思维和本地错题集，提供三层问题解决模型、双轨调试方法、生产环境验证、工具使用指南和经验积累。适用于故障排查、性能优化、系统重构和创新突破。",
+      "description": "系统化问题解决技能 - 整合 5 Whys 根因分析、第一性原理重建思维、本地错题集和保底回退机制。提供三层问题解决模型、双轨调试方法、debug-log.md 结构化记录。超过 3 次 debug 未解决自动输出 ROLLBACK 信号触发 dev-loop 回退重试。适用于故障排查、性能优化、系统重构。",
       "source": "./",
       "strict": false,
       "skills": [
@@ -47,7 +47,7 @@
     },
     {
       "name": "dev-loop",
-      "description": "自动迭代调度器 - 循环调用 dev-flow 完成所有任务。每次迭代 = 1 次 dev-flow 执行（5 步闭环）。仅 2 个组件：tasks.md（任务清单）、loop 脚本（5 行循环）。触发场景：\"开始迭代\"、\"启动 loop\"、\"dev loop\"。",
+      "description": "Project Orchestrator - 读取 tasks.md（产品设计文档）生成 task-details.md（技术设计），通过文件协议调度 dev-flow subagent 逐个执行子任务，集成 git version control（checkpoint/commit/rollback）和 debug 保底回退机制。触发场景：\"开始迭代\"、\"启动 loop\"、\"dev loop\"。",
       "source": "./",
       "strict": false,
       "skills": [
@@ -83,7 +83,7 @@
     },
     {
       "name": "dev-flow",
-      "description": "持久开发流程 - 管理开发任务的完整生命周期，包括任务识别、拆解、执行、测试和调试。**自动激活**：所有开发相关任务。提供系统化的任务追踪，与 first-principles 和 dev-debug 技能深度集成。",
+      "description": "Task Executor - 接收单个子任务，完成 实现→测试→debug 闭环。由 dev-loop orchestrator 通过文件协议调度。读取 task-details.md 子任务，执行实现，调用 dev-verify 测试，失败时调用 dev-debug（最多3次），结果写入 task-result.md。**自动激活**：所有开发相关任务。",
       "source": "./",
       "strict": false,
       "skills": [
@@ -92,7 +92,7 @@
     },
     {
       "name": "dev-verify",
-      "description": "自动化测试验证执行器 - 真实运行测试（非AI模拟）+ Linus Torvalds 5层分析 + 失败自动调用dev-debug。**自动激活**：dev-flow Step 4测试验证阶段、用户手动调用\"验证测试\"、\"运行测试\"、\"test all\"。支持pytest/jest/go-test/mvn-test等多框架检测与执行。",
+      "description": "自动化测试验证执行器 - 真实运行测试（非AI模拟）+ Linus Torvalds 5层代码审查。由 dev-flow 在测试阶段调用，返回测试结果。v7.0 中不再直接调用 dev-debug（由 dev-flow 管理 debug 循环和 ROLLBACK）。支持 pytest/jest/go-test/mvn-test 等多框架检测与执行。",
       "source": "./",
       "strict": false,
       "skills": [

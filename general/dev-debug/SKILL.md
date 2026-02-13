@@ -1,6 +1,6 @@
 ---
 name: dev-debug
-description: 系统化问题解决技能 - 整合 5 Whys 根因分析、第一性原理重建思维和本地错题集。**自动激活**：遇到错误、异常、故障、性能问题时自动启动调试流程。触发场景："报错"、"bug"、"调试"、"debug"、"异常"、"错误"、"性能慢"、"不工作"、"出问题"、"故障"、"崩溃"、"内存泄漏"。**语义信号**：🔴强信号（错误代码/堆栈跟踪）、🟡中等信号（性能问题/行为异常）。
+description: 系统化问题解决技能 - 整合 5 Whys 根因分析、第一性原理重建思维、本地错题集和保底回退机制。**自动激活**：遇到错误、异常、故障、性能问题时自动启动调试流程。触发场景："报错"、"bug"、"调试"、"debug"、"异常"、"错误"、"性能慢"、"不工作"、"出问题"、"故障"、"崩溃"、"内存泄漏"。**语义信号**：🔴强信号（错误代码/堆栈跟踪）、🟡中等信号（性能问题/行为异常）。**保底机制**：debug 超过 3 次未解决 → 输出 ROLLBACK 信号 → 触发 dev-loop 回退到上一版本重新实现。
 alwaysActivate: true
 ---
 
@@ -14,6 +14,72 @@ alwaysActivate: true
 > **CRITICAL**: 在提出任何解决方案之前，必须通过此框架进行问题分析和路径选择。
 >
 > **错题集系统**：自动维护项目的"错题集"（`.claude/debug-experiences/`），记录每次调试的成功和失败经验，持续积累项目特定的 debug 智慧。
+>
+> **保底回退机制**：每次 debug 尝试记录到 `debug-log.md`，超过 MAX_DEBUG_RETRIES (3次) 未解决则输出 ROLLBACK 信号，触发 dev-loop 回退到 git checkpoint 并换方向重试。
+
+---
+
+## 🛡️ 保底回退机制（v7.0 新增）
+
+### 核心概念
+
+当 debug 多次尝试仍无法解决问题时，不应该无限循环，而是**果断回退**：
+
+```
+MAX_DEBUG_RETRIES = 3
+
+debug 尝试 1 → 失败 → 记录到 debug-log.md
+debug 尝试 2 → 失败 → 记录到 debug-log.md
+debug 尝试 3 → 失败 → 记录到 debug-log.md → 输出 ROLLBACK 信号
+```
+
+### debug-log.md 协议
+
+**每次 debug 尝试必须追加记录到 `debug-log.md`**：
+
+```markdown
+## Attempt N/3
+
+- **时间**: YYYY-MM-DD HH:mm
+- **错误描述**: [错误信息/堆栈跟踪]
+- **分析方法**: [5 Whys | First Principles]
+- **根因分析**: [分析过程和结论]
+- **尝试方案**: [具体做了什么修改]
+- **修改文件**: [file1.py:L42, file2.py:L15]
+- **结果**: [FIXED | FAILED]
+- **失败原因**: [如果 FAILED，为什么这个方案不行]
+```
+
+### Phase 0: 重试检查（每次 debug 入口必执行）
+
+**在任何分析之前**，先检查 debug-log.md：
+
+```
+读取 debug-log.md
+  ├─ 不存在 → 首次尝试，创建文件，继续正常流程
+  ├─ 存在但尝试次数 < 3 → 读取之前的失败记录，
+  │   标记排除方案，继续正常流程
+  └─ 存在且尝试次数 >= 3 → 直接输出 ROLLBACK：
+
+      AI: "🛑 已达最大 debug 重试次数 (3/3)
+           之前的尝试均失败：
+           1. [方案1] - [失败原因]
+           2. [方案2] - [失败原因]
+           3. [方案3] - [失败原因]
+
+           建议 ROLLBACK 并换方向重试。
+           SIGNAL: ROLLBACK"
+```
+
+### ROLLBACK 后的行为
+
+当 dev-loop 收到 ROLLBACK 信号：
+1. **git reset** 回到 checkpoint
+2. **保留 debug-log.md**（错误记忆）
+3. **重新调度 subagent**，prompt 中包含"请避免以下方案"
+4. 新 subagent 读取 debug-log.md，了解什么路不通，换条路走
+
+**关键**：debug-log.md 是跨 rollback 的"错误记忆"，防止 subagent 重蹈覆辙。
 
 ---
 
@@ -145,6 +211,61 @@ SOLUTION: 添加 finally 块
 ---
 
 ## 🔍 调查流程（整合版）
+
+### Phase 0: 重试检查（入口必执行）
+
+**在任何分析之前，首先检查 debug-log.md**：
+
+```bash
+# 检查 debug-log.md 是否存在
+if [ -f "debug-log.md" ]; then
+  # 计算已有尝试次数
+  attempt_count=$(grep -c "^## Attempt" debug-log.md)
+  
+  if [ $attempt_count -ge 3 ]; then
+    # 已达上限，直接输出 ROLLBACK
+    echo "SIGNAL: ROLLBACK"
+    exit 0
+  fi
+  
+  # 读取之前的失败方案，标记为排除项
+  echo "检测到之前的 $attempt_count 次失败尝试"
+  echo "将避免以下方案："
+  grep "尝试方案" debug-log.md
+fi
+```
+
+**执行逻辑**：
+
+```
+1. 读取 debug-log.md
+   ├─ 不存在 → 创建文件头部，设置 attempt = 1，继续 Phase 1
+   ├─ 尝试次数 < 3 → 读取排除方案列表，设置 attempt = N+1，继续 Phase 1
+   └─ 尝试次数 >= 3 → 输出 ROLLBACK 信号，结束
+
+2. 如果继续：在 debug-log.md 末尾追加新的 Attempt 块头部
+   ## Attempt N/3
+   - **时间**: [当前时间]
+   - **错误描述**: [待填充]
+```
+
+**ROLLBACK 输出格式**：
+
+```markdown
+🛑 Debug 重试次数已耗尽 (3/3)
+
+之前的尝试：
+1. [Attempt 1 方案] → [失败原因]
+2. [Attempt 2 方案] → [失败原因]
+3. [Attempt 3 方案] → [失败原因]
+
+汇总结论：[根本问题是什么]
+建议方向：[下次应尝试的不同路径]
+
+SIGNAL: ROLLBACK
+```
+
+---
 
 ### Phase 1: 信息收集（所有情况通用）
 
@@ -420,10 +541,56 @@ curl -H "Cache-Control: no-cache" https://domain.com/assets/index-FPRo3oei.js
 - 工具成功 ≠ 生产现实（CDN/缓存会产生差距）
 - 验证用户实际看到的内容，而不是你认为他们看到的
 
-### Phase 5.5: 经验记录（持续积累）
+### Phase 5.5: debug-log.md 更新（每次必执行）
+
+**在 Phase 5 验证之后，无论成功还是失败，都必须更新 debug-log.md**：
+
+```markdown
+# 追加到 debug-log.md 当前 Attempt 块
+
+- **根因分析**: [Phase 3 的分析结论]
+- **尝试方案**: [Phase 4 的解决方案]
+- **修改文件**: [具体文件和行号]
+- **结果**: [FIXED | FAILED]
+- **失败原因**: [如果 FAILED，具体原因]
+```
+
+**结果处理**：
+
+```
+Phase 5 验证结果：
+  ├─ 测试通过 (FIXED)
+  │   → 更新 debug-log.md: 结果 = FIXED
+  │   → 返回 FIXED 信号给 dev-flow
+  │   → 继续 Phase 5.6 记录经验
+  │
+  └─ 测试失败 (FAILED)
+      → 更新 debug-log.md: 结果 = FAILED
+      → 检查当前 attempt 是否 >= MAX_DEBUG_RETRIES (3)
+        ├─ 是 → 在 debug-log.md 追加 EXHAUSTED 汇总块
+        │       → 返回 ROLLBACK 信号给 dev-flow
+        └─ 否 → 返回 FAILED 信号，等待 dev-flow 再次调用
+```
+
+**EXHAUSTED 汇总块格式**（当 attempt >= 3 时追加）：
+
+```markdown
+---
+
+## 汇总 - EXHAUSTED
+
+- **结论**: 已达最大重试次数 (3/3)，建议 ROLLBACK
+- **失败原因汇总**: [综合 3 次尝试的关键洞察]
+- **排除的方案**: [列出已尝试但失败的方案]
+- **下次建议**: [基于失败经验，建议换什么方向]
+```
+
+---
+
+### Phase 5.6: 经验记录（持续积累）
 
 **记录时机**：
-- Debug 完成后（验证通过）
+- Debug 完成后（验证通过，即 FIXED）
 - 记录到 `.claude/debug-experiences/`
 - 首次使用时自动创建目录结构
 
@@ -965,13 +1132,17 @@ dd if=/dev/zero of=test.dat bs=1M count=100
 ### 完整流程图
 
 ```
-1. 接收问题 / 语义信号检测
+0. [Phase 0] 重试检查（入口必执行）⭐ v7.0
+   ├─ 读取 debug-log.md
+   ├─ 尝试次数 >= 3 → ROLLBACK 信号 → 结束
+   ├─ 尝试次数 < 3 → 读取排除方案列表
+   └─ 不存在 → 首次尝试，创建文件
    ↓
-2. 信息收集 (Read/Grep/Bash)
+1. [Phase 1] 信息收集 (Read/Grep/Bash)
    ↓
-2.5. 经验检索（智能激活）⭐ NEW
+1.5. [Phase 1.5] 经验检索（智能激活）
    ├─ 检测错题集是否存在？
-   │  ├─ 不存在 → 跳到 Step 3
+   │  ├─ 不存在 → 跳到 Phase 2
    │  └─ 存在 → 继续
    ├─ 读取 INDEX 前 50 行
    ├─ 相关性匹配（标签/关键词/频率）
@@ -981,7 +1152,7 @@ dd if=/dev/zero of=test.dat bs=1M count=100
    │  └─ ⚠️  失败经验（避免此路径）
    └─ 询问用户是否参考 [Y/n]
    ↓
-3. 问题分类决策
+2. [Phase 2] 问题分类决策
    ↓
    ├─ 明确错误？ → 轨道 A (5 Whys)
    │    ↓
@@ -1000,10 +1171,16 @@ dd if=/dev/zero of=test.dat bs=1M count=100
              ├─ 重构系统
              └─ 接受差异
    ↓
-4. 验证（生产环境 + 标准测试）
+4. [Phase 5] 验证（生产环境 + 标准测试）
    ↓
-4.5. 记录经验（持续积累）⭐ NEW
-   ├─ 创建/更新经验文件
+4.5. [Phase 5.5] 更新 debug-log.md ⭐ v7.0
+   ├─ 记录本次尝试结果 (FIXED/FAILED)
+   ├─ 如果 FIXED → 返回 FIXED 信号
+   ├─ 如果 FAILED 且未达上限 → 返回 FAILED 信号
+   └─ 如果 FAILED 且达上限 → 追加 EXHAUSTED 汇总 → 返回 ROLLBACK 信号
+   ↓
+5. [Phase 5.6] 记录经验（仅 FIXED 时）
+   ├─ 创建/更新 .claude/debug-experiences/ 经验文件
    │  ├─ [SUCCESS] / [FAILURE]
    │  ├─ Problem, Tags, Root Cause, Solution
    │  └─ Lessons Learned (失败)
@@ -1013,7 +1190,7 @@ dd if=/dev/zero of=test.dat bs=1M count=100
    │  └─ 标签索引
    └─ 提交 Git（可选）
    ↓
-5. 文档化（决策依据 + 解决方案）
+6. 文档化（决策依据 + 解决方案）
 ```
 
 ### 语义激活流程
@@ -1193,5 +1370,41 @@ Debug 技能发现问题分类后：
 | 创新突破 | **first-principles** |
 
 ---
+
+## 📄 与 dev-loop / dev-flow 的集成
+
+### 在 subagent 模式下的行为
+
+当 dev-debug 被 dev-flow subagent 调用时：
+
+```
+dev-flow 检测到测试失败
+  ↓
+调用 dev-debug
+  ↓
+Phase 0: 检查 debug-log.md
+  ├─ 已有 3 次尝试 → 返回 ROLLBACK 信号给 dev-flow
+  │   → dev-flow 写入 task-result.md (ROLLBACK)
+  │   → dev-loop 执行 git rollback
+  │
+  └─ 还有尝试机会 → 正常执行 Phase 1-5
+      → 修复后返回 FIXED 信号给 dev-flow
+      → dev-flow 重新测试
+      → 如果通过 → task-result.md (SUCCESS)
+      → 如果失败 → 再次调用 dev-debug（循环）
+```
+
+### 信号协议
+
+| 信号 | 含义 | 触发条件 |
+|------|------|----------|
+| `FIXED` | 问题已修复 | Phase 5 验证通过 |
+| `FAILED` | 本次尝试失败 | Phase 5 验证未通过，但还有重试机会 |
+| `ROLLBACK` | 放弃修复 | 已达 MAX_DEBUG_RETRIES (3次) |
+
+---
+
+**版本**: v7.0.0 (保底回退机制 + debug-log.md 协议)
+**最后更新**: 2026-02-13
 
 **End of Dev-Debug Skill**
