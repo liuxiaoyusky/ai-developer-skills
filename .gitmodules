@@ -1,3 +1,15 @@
 [submodule "masters_skills/skills"]
 	path = masters_skills/skills
 	url = https://github.com/GBSOSS/skill-from-masters.git
+[submodule "self-improving-agent"]
+	path = self-improving-agent
+	url = https://github.com/peterskoett/self-improving-agent.git
+[submodule "superpowers"]
+	path = superpowers
+	url = https://github.com/obra/superpowers.git
+[submodule "anthropic-skills"]
+	path = anthropic-skills
+	url = https://github.com/anthropics/skills.git
+[submodule "awesome-claude-skills"]
+	path = awesome-claude-skills
+	url = https://github.com/karanb192/awesome-claude-skills.git
