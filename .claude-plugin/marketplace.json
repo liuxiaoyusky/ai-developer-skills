@@ -160,6 +160,70 @@
       "skills": [
         "./wechat-miniprogram"
       ]
+    },
+    {
+      "name": "self-improving-agent",
+      "description": "持续自我改进技能 - 捕获学习、错误和纠正，跨会话积累经验。自动触发场景：命令失败、用户纠正、知识过时、发现更好方案。支持学习日志、错题集、特性请求追踪，并可将高价值学习提升为项目记忆（CLAUDE.md/AGENTS.md）。来源：peterskoett/self-improving-agent (Git Submodule)。",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./self-improving-agent"
+      ]
+    },
+    {
+      "name": "superpowers",
+      "description": "obra/superpowers 实战技能集合（14 个技能）- 包含 TDD、系统化调试、头脑风暴、代码审查、并行 Agent 调度、Git Worktree 隔离、计划编写与执行、验证完成等。覆盖开发全流程的最佳实践。来源：obra/superpowers (Git Submodule)。",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./superpowers/skills/brainstorming",
+        "./superpowers/skills/dispatching-parallel-agents",
+        "./superpowers/skills/executing-plans",
+        "./superpowers/skills/finishing-a-development-branch",
+        "./superpowers/skills/receiving-code-review",
+        "./superpowers/skills/requesting-code-review",
+        "./superpowers/skills/subagent-driven-development",
+        "./superpowers/skills/systematic-debugging",
+        "./superpowers/skills/test-driven-development",
+        "./superpowers/skills/using-git-worktrees",
+        "./superpowers/skills/using-superpowers",
+        "./superpowers/skills/verification-before-completion",
+        "./superpowers/skills/writing-plans",
+        "./superpowers/skills/writing-skills"
+      ]
+    },
+    {
+      "name": "anthropic-skills",
+      "description": "Anthropic 官方技能集合（16 个技能）- 包含文档处理（DOCX/PDF/PPTX/XLSX）、前端设计、MCP 服务器构建、算法艺术、品牌指南、Canvas 设计、Web 应用测试等。来源：anthropics/skills (Git Submodule)。",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./anthropic-skills/skills/algorithmic-art",
+        "./anthropic-skills/skills/brand-guidelines",
+        "./anthropic-skills/skills/canvas-design",
+        "./anthropic-skills/skills/doc-coauthoring",
+        "./anthropic-skills/skills/docx",
+        "./anthropic-skills/skills/frontend-design",
+        "./anthropic-skills/skills/internal-comms",
+        "./anthropic-skills/skills/mcp-builder",
+        "./anthropic-skills/skills/pdf",
+        "./anthropic-skills/skills/pptx",
+        "./anthropic-skills/skills/skill-creator",
+        "./anthropic-skills/skills/slack-gif-creator",
+        "./anthropic-skills/skills/theme-factory",
+        "./anthropic-skills/skills/web-artifacts-builder",
+        "./anthropic-skills/skills/webapp-testing",
+        "./anthropic-skills/skills/xlsx"
+      ]
+    },
+    {
+      "name": "awesome-claude-skills",
+      "description": "社区 Claude 技能索引（50+ 技能参考）- 来自 karanb192/awesome-claude-skills 的精选技能目录，包含分类、安装指南和社区验证。作为技能发现和参考资源。来源：karanb192/awesome-claude-skills (Git Submodule)。",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./awesome-claude-skills"
+      ]
     }
   ]
 }

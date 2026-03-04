@@ -1,0 +1,192 @@
+{
+  "version": "2.0.0",
+  "generated_at": "2026-03-04",
+  "skills": [
+    {
+      "name": "business-email",
+      "source_path": "./business_routing/business-email",
+      "description": "Business email routing and management",
+      "type": "local"
+    },
+    {
+      "name": "dev-loop",
+      "source_path": "./general/dev-loop",
+      "description": "Automatic iteration scheduler for long-term projects",
+      "type": "local"
+    },
+    {
+      "name": "dev-flow",
+      "source_path": "./general/dev-flow",
+      "description": "Persistent development workflow - manages complete task lifecycle",
+      "type": "local"
+    },
+    {
+      "name": "dev-debug",
+      "source_path": "./general/dev-debug",
+      "description": "Systematic debugging and root cause analysis",
+      "type": "local"
+    },
+    {
+      "name": "conversation-exporter",
+      "source_path": "./general/conversation-exporter",
+      "description": "Export conversation history to files",
+      "type": "local"
+    },
+    {
+      "name": "dev-verify",
+      "source_path": "./general/dev-verify",
+      "description": "Test verification framework with framework detection",
+      "type": "local"
+    },
+    {
+      "name": "first-principles-planner",
+      "source_path": "./general/first-principles-planner",
+      "description": "Product design applications using first principles",
+      "type": "local"
+    },
+    {
+      "name": "n8n-mcp-workflow",
+      "source_path": "./general/n8n-mcp-workflow/skills/n8n-mcp-workflow",
+      "description": "n8n MCP workflow integration",
+      "type": "local"
+    },
+    {
+      "name": "first-principles",
+      "source_path": "./general/first-principles",
+      "description": "First principles thinking for task decomposition",
+      "type": "local"
+    },
+    {
+      "name": "dev-review",
+      "source_path": "./general/dev-review",
+      "description": "Code review skill based on Linus Torvalds thinking",
+      "type": "local"
+    },
+    {
+      "name": "skill-checker",
+      "source_path": "./general/skill-checker/skills/skill-checker",
+      "description": "Skill validation and checking tools",
+      "type": "local"
+    },
+    {
+      "name": "web-browser-skill",
+      "source_path": "./web-browser-skill",
+      "description": "Web browsing and interaction capabilities",
+      "type": "local"
+    },
+    {
+      "name": "skill-from-masters",
+      "source_path": "./masters_skills/skills/skill-from-masters",
+      "description": "Skill creation methodology",
+      "type": "submodule",
+      "repo": "https://github.com/GBSOSS/skill-from-masters.git"
+    },
+    {
+      "name": "skill-from-github",
+      "source_path": "./masters_skills/skills/skills/skill-from-github",
+      "description": "Create skills from GitHub repositories",
+      "type": "submodule",
+      "repo": "https://github.com/GBSOSS/skill-from-masters.git"
+    },
+    {
+      "name": "search-skill",
+      "source_path": "./masters_skills/skills/skills/search-skill",
+      "description": "Search and find existing skills",
+      "type": "submodule",
+      "repo": "https://github.com/GBSOSS/skill-from-masters.git"
+    },
+    {
+      "name": "skill-from-notebook",
+      "source_path": "./masters_skills/skills/skills/skill-from-notebook",
+      "description": "Create skills from Jupyter notebooks",
+      "type": "submodule",
+      "repo": "https://github.com/GBSOSS/skill-from-masters.git"
+    },
+    {
+      "name": "wechat-miniprogram",
+      "source_path": "./wechat-miniprogram",
+      "description": "WeChat Mini Program development with CloudBase",
+      "type": "local"
+    },
+    {
+      "name": "doc-auditor",
+      "source_path": "./doc-auditor",
+      "description": "AI-assisted project documentation auditing tool",
+      "type": "local"
+    },
+    {
+      "name": "free-ai-chat-deployment",
+      "source_path": "./free-ai-chat-deployment",
+      "description": "Deployment scripts for free AI chat applications",
+      "type": "local"
+    },
+    {
+      "name": "self-improving-agent",
+      "source_path": "./self-improving-agent",
+      "description": "Captures learnings, errors, and corrections to enable continuous improvement across sessions",
+      "type": "submodule",
+      "repo": "https://github.com/peterskoett/self-improving-agent.git"
+    },
+    {
+      "name": "superpowers",
+      "source_path": "./superpowers/skills",
+      "description": "Battle-tested skill collection: TDD, debugging, brainstorming, code review, parallel agents, git worktrees (14 skills)",
+      "type": "submodule",
+      "repo": "https://github.com/obra/superpowers.git",
+      "sub_skills": [
+        "brainstorming",
+        "dispatching-parallel-agents",
+        "executing-plans",
+        "finishing-a-development-branch",
+        "receiving-code-review",
+        "requesting-code-review",
+        "subagent-driven-development",
+        "systematic-debugging",
+        "test-driven-development",
+        "using-git-worktrees",
+        "using-superpowers",
+        "verification-before-completion",
+        "writing-plans",
+        "writing-skills"
+      ]
+    },
+    {
+      "name": "anthropic-skills",
+      "source_path": "./anthropic-skills/skills",
+      "description": "Anthropic official skills: docs, PDF, PPTX, XLSX, frontend design, MCP builder, etc. (16 skills)",
+      "type": "submodule",
+      "repo": "https://github.com/anthropics/skills.git",
+      "sub_skills": [
+        "algorithmic-art",
+        "brand-guidelines",
+        "canvas-design",
+        "doc-coauthoring",
+        "docx",
+        "frontend-design",
+        "internal-comms",
+        "mcp-builder",
+        "pdf",
+        "pptx",
+        "skill-creator",
+        "slack-gif-creator",
+        "theme-factory",
+        "web-artifacts-builder",
+        "webapp-testing",
+        "xlsx"
+      ]
+    },
+    {
+      "name": "awesome-claude-skills",
+      "source_path": "./awesome-claude-skills",
+      "description": "Curated index of 50+ community Claude skills with install guides and categorization",
+      "type": "submodule",
+      "repo": "https://github.com/karanb192/awesome-claude-skills.git",
+      "note": "Reference/index only, no installable SKILL.md"
+    }
+  ],
+  "installation_paths": {
+    "claude_code": "~/.claude/skills/",
+    "codex": "~/.codex/skills/"
+  },
+  "total_skills": 23
+}
